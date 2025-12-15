@@ -4,21 +4,35 @@ import {Navbar, Nav} from "react-bootstrap";
 
 import {openInNewSvg} from "../../svg";
 
+interface NavBarProps {
+  network?: string;
+}
 
-const NavBar = () => {
-    return <Navbar className="main-nav-bar" expand="md">
-        <Navbar.Brand href="#home"><img
-            src="/logo.png"
-            alt="Logo"
-            height="30"
-            className="d-inline-block align-top"
-        /></Navbar.Brand>
+const NavBar: React.FC<NavBarProps> = ({ network }) => {
+    return <Navbar className="main-nav-bar" expand="md" bg="dark" sticky="top">
+        <Navbar.Brand href="#home" className="text-white">
+            <img
+                src="/logo.png"
+                alt="Logo"
+                height="30"
+                className="d-inline-block align-top"
+                style={{ marginRight: '10px' }}
+            />
+            <span>STX Node Map</span>
+            {network && <small className="ms-2 text-muted">({network})</small>}
+        </Navbar.Brand>
         <Navbar.Toggle/>
         <Navbar.Collapse>
-            <Nav className="ml-auto">
-                <Nav.Link href="https://testnet-explorer.blockstack.org" target="_blank">Stacks Explorer {openInNewSvg}</Nav.Link>
-                <Nav.Link href="https://stackstoken.com" target="_blank">Stacks Token {openInNewSvg}</Nav.Link>
-                <Nav.Link href="https://www.blockstack.org" target="_blank">Blockstack {openInNewSvg}</Nav.Link>
+            <Nav className="ms-auto">
+                <Nav.Link href="https://stacks.org" target="_blank" className="text-white">
+                  Stacks {openInNewSvg}
+                </Nav.Link>
+                <Nav.Link href="https://docs.stacks.co" target="_blank" className="text-white">
+                  Documentation {openInNewSvg}
+                </Nav.Link>
+                <Nav.Link href="https://github.com" target="_blank" className="text-white">
+                  GitHub {openInNewSvg}
+                </Nav.Link>
             </Nav>
         </Navbar.Collapse>
     </Navbar>

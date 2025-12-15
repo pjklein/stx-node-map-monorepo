@@ -9,6 +9,22 @@ $md-break: map-get($grid-breakpoints, "md");
 $lg-break: map-get($grid-breakpoints, "lg");
 $xl-break: map-get($grid-breakpoints, "xl");
 
+body {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.App {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
 
 @import "components/navbar";
 @import "components/info-card";
