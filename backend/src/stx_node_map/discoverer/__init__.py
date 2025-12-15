@@ -25,15 +25,24 @@ def ip_to_location(ip: str):
     return resp.json()
 
 
-def make_core_api_url(host: str):
+def make_core_api_url(host: str, endpoint: str = "neighbors"):
     if "stack" in host:
-        return "http://{}/v2/neighbors".format(host)
+        return "http://{}/v2/{}".format(host, endpoint)
 
-    return "http://{}:20443/v2/neighbors".format(host)
+    return "http://{}:20443/v2/{}".format(host, endpoint)
+
+
+def get_server_version(host: str):
+    url = make_core_api_url(host, "info")
+    try:
+        resp = requests.get(url, timeout=4).json()
+        return resp.get("server_version")
+    except BaseException:
+        return None
 
 
 def get_neighbors(host: str):
-    url = make_core_api_url(host)
+    url = make_core_api_url(host, "neighbors")
     try:
         json = requests.get(url, timeout=4).json()
     except BaseException:
@@ -61,7 +70,13 @@ def scan_list(list_):
 
 
 def worker():
-    seed = get_neighbors(assert_env_vars("DISCOVERER_MAIN_NODE"))
+    seed_nodes = assert_env_vars("DISCOVERER_SEED_NODES").split(",")
+    seed = []
+    
+    for node in seed_nodes:
+        neighbors = get_neighbors(node.strip())
+        seed += [n for n in neighbors if n not in seed]
+    
     print(seed)
     if len(seed) == 0:
         return
@@ -82,6 +97,7 @@ def worker():
     for address in found:
         neighbors = get_neighbors(address)
         location = ip_to_location(address)
+        server_version = get_server_version(address)
 
         if len(neighbors) > 0 and location is not None:
             logging.info("{} is a public node".format(address))
@@ -93,13 +109,15 @@ def worker():
                     "lng": location["longitude"],
                     "country": location["country_name"],
                     "city": location["city"]
-                }
+                },
+                "server_version": server_version
             }
         else:
             logging.info("{} is a private node".format(address))
 
             item = {
-                "address": address
+                "address": address,
+                "server_version": server_version
             }
 
         result.append(item)
