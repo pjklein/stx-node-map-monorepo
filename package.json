@@ -1,0 +1,31 @@
+{
+  "name": "stx-node-map-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack STX node map application",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "backend:install": "cd backend && pip install -r requirements.txt",
+    "backend:dev": "cd backend && export NETWORK=mainnet && python run.py api",
+    "backend:start": "cd backend && python run.py api",
+    "frontend:install": "cd frontend && yarn install",
+    "frontend:dev": "cd frontend && yarn start",
+    "frontend:build": "cd frontend && yarn build",
+    "frontend:test": "cd frontend && yarn test",
+    "dev": "echo 'Run backend and frontend in separate terminals' && echo 'Backend: yarn backend:dev' && echo 'Frontend: yarn frontend:dev'",
+    "install:all": "yarn frontend:install && yarn backend:install",
+    "build": "yarn frontend:build"
+  },
+  "keywords": [
+    "stacks",
+    "stx",
+    "nodes",
+    "map",
+    "geolocation"
+  ],
+  "author": "Stacks Community",
+  "license": "MIT"
+}
