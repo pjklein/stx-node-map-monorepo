@@ -3,7 +3,7 @@ import logging
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 
@@ -15,7 +15,8 @@ this_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 def ip_to_location(ip: str):
-    url = "https://freegeoip.app/json/{}".format(ip)
+    """Fetch geolocation from GeoJS.io (unlimited calls, no rate limits)"""
+    url = "https://get.geojs.io/v1/geo/{}.json".format(ip)
     try:
         resp = requests.get(url, timeout=5)
     except BaseException:
@@ -24,7 +25,30 @@ def ip_to_location(ip: str):
     if resp.status_code != 200:
         return None
 
-    return resp.json()
+    data = resp.json()
+    # Map GeoJS response to our format
+    return {
+        "latitude": float(data.get("latitude", 0)),
+        "longitude": float(data.get("longitude", 0)),
+        "country_name": data.get("country", ""),
+        "city": data.get("city", "")
+    }
+
+
+def should_fetch_geolocation(known_nodes: dict, ip: str) -> bool:
+    """Check if we should fetch geolocation for this IP (only once per month)"""
+    if ip not in known_nodes:
+        return True  # New node, fetch location
+    
+    node = known_nodes[ip]
+    if "location_fetched_at" not in node:
+        return True  # No timestamp, fetch location
+    
+    last_fetch = datetime.fromisoformat(node["location_fetched_at"])
+    if datetime.utcnow() - last_fetch > timedelta(days=30):
+        return True  # More than 30 days old, fetch again
+    
+    return False  # Recently fetched, skip
 
 
 def make_core_api_url(host: str, endpoint: str = "neighbors"):
@@ -147,11 +171,23 @@ def worker():
     
     # Create result list, updating with info for all nodes
     result = []
+    geolocation_calls = 0
     
     for address in found:
         neighbors = get_neighbors(address)
-        location = ip_to_location(address)
         node_info = get_node_info(address)
+        
+        # Check if we should fetch geolocation (only once per month)
+        location = None
+        if should_fetch_geolocation(known_nodes, address):
+            location = ip_to_location(address)
+            geolocation_calls += 1
+            logging.info("Fetched geolocation for {}".format(address))
+        else:
+            # Use cached location if available
+            if address in known_nodes and "location" in known_nodes[address]:
+                location = known_nodes[address]["location"]
+                logging.info("Using cached location for {}".format(address))
 
         if len(neighbors) > 0 and location is not None:
             logging.info("{} is a public node".format(address))
@@ -166,7 +202,8 @@ def worker():
                 },
                 "server_version": node_info.get("server_version"),
                 "burn_block_height": node_info.get("burn_block_height"),
-                "last_seen": datetime.utcnow().isoformat()
+                "last_seen": datetime.utcnow().isoformat(),
+                "location_fetched_at": datetime.utcnow().isoformat()
             }
         else:
             logging.info("{} is a private node".format(address))
@@ -182,7 +219,7 @@ def worker():
 
     save_path = os.path.join(this_dir, "..", "..", "..", "data.json")
     file_write(save_path, json.dumps(result))
-    logging.info("Saved {} nodes".format(len(result)))
+    logging.info("Saved {} nodes (made {} geolocation API calls)".format(len(result), geolocation_calls))
 
 
 def periodic_rescan():
