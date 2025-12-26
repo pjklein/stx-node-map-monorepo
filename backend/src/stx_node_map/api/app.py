@@ -34,6 +34,22 @@ def __flask_setup():
 
         return jsonify(resp)
 
+    @app.route("/status")
+    def status():
+        status_path = os.path.join(this_dir, "..", "..", "..", "status.json")
+        try:
+            data = json.loads(file_read(status_path))
+        except FileNotFoundError:
+            data = {
+                "status": "Unknown",
+                "nodes_count": 0,
+                "scanning": False,
+                "last_scan": None,
+                "timestamp": None
+            }
+
+        return jsonify(data)
+
 
 def __run_dev_server():
     global app

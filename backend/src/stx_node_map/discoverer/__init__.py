@@ -157,7 +157,22 @@ def load_known_nodes():
         return {}
 
 
+def write_status(status, nodes_count=0, scanning=False, last_scan=None):
+    """Write discovery status to status.json"""
+    status_path = os.path.join(this_dir, "..", "..", "..", "status.json")
+    status_data = {
+        "status": status,
+        "nodes_count": nodes_count,
+        "scanning": scanning,
+        "last_scan": last_scan or datetime.utcnow().isoformat(),
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    file_write(status_path, json.dumps(status_data))
+
+
 def worker():
+    write_status("Starting discovery walk", scanning=True)
+    
     seed_nodes = assert_env_vars("DISCOVERER_SEED_NODES").split(",")
     seed = []
     
@@ -167,9 +182,11 @@ def worker():
     
     print(seed)
     if len(seed) == 0:
+        write_status("No seed nodes found", scanning=False)
         return
 
     # scan
+    write_status("Scanning network", len(seed), scanning=True)
     found = scan_list(seed)
     found += scan_list(found)
     found += scan_list(found)
@@ -179,6 +196,7 @@ def worker():
 
     logging.info("{} nodes found.".format(len(found)))
     logging.info("Detecting locations")
+    write_status("Fetching geolocation", len(found), scanning=True)
 
     # Load existing known nodes
     known_nodes = load_known_nodes()
@@ -250,10 +268,12 @@ def periodic_rescan():
         time.sleep(600)  # Wait 10 minutes before first rescan
         
         logging.info("Starting periodic rescan of known nodes")
+        write_status("Periodic rescan", scanning=True)
         known_nodes = load_known_nodes()
         
         if not known_nodes:
             logging.info("No known nodes to rescan")
+            write_status("Idle", 0, scanning=False)
             continue
         
         addresses = list(known_nodes.keys())
@@ -273,6 +293,8 @@ def periodic_rescan():
         result = list(known_nodes.values())
         file_write(save_path, json.dumps(result))
         logging.info("Periodic rescan completed, saved {} nodes".format(len(result)))
+        write_status("Idle", len(result), scanning=False)
+        write_status("Idle", len(result), scanning=False)
 
 
 def main():
