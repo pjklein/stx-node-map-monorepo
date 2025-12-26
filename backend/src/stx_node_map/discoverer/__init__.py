@@ -2,6 +2,8 @@ import json
 import logging
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 
 import requests
 
@@ -41,6 +43,19 @@ def get_server_version(host: str):
         return None
 
 
+def get_node_info(host: str):
+    """Fetch /v2/info for a node and extract server_version and burn_block_height"""
+    url = make_core_api_url(host, "info")
+    try:
+        resp = requests.get(url, timeout=4).json()
+        return {
+            "server_version": resp.get("server_version"),
+            "burn_block_height": resp.get("burn_block_height")
+        }
+    except BaseException:
+        return {"server_version": None, "burn_block_height": None}
+
+
 def get_neighbors(host: str):
     url = make_core_api_url(host, "neighbors")
     try:
@@ -69,6 +84,41 @@ def scan_list(list_):
     return found
 
 
+def rescan_nodes_info(addresses):
+    """Concurrently fetch /v2/info for multiple nodes"""
+    results = {}
+    
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_address = {executor.submit(get_node_info, addr): addr for addr in addresses}
+        
+        for future in as_completed(future_to_address):
+            address = future_to_address[future]
+            try:
+                info = future.result()
+                results[address] = info
+                logging.info("Updated info for {}: v{}".format(address, info.get("server_version", "unknown")))
+            except Exception as e:
+                logging.error("Error fetching info for {}: {}".format(address, e))
+                results[address] = {"server_version": None, "burn_block_height": None}
+    
+    return results
+
+
+def load_known_nodes():
+    """Load known nodes from data.json"""
+    save_path = os.path.join(this_dir, "..", "..", "..", "data.json")
+    if not os.path.exists(save_path):
+        return {}
+    
+    try:
+        with open(save_path, 'r') as f:
+            nodes = json.load(f)
+        # Convert list to dict keyed by address
+        return {node.get("address"): node for node in nodes if isinstance(nodes, list)}
+    except BaseException:
+        return {}
+
+
 def worker():
     seed_nodes = assert_env_vars("DISCOVERER_SEED_NODES").split(",")
     seed = []
@@ -81,7 +131,7 @@ def worker():
     if len(seed) == 0:
         return
 
-        # scan
+    # scan
     found = scan_list(seed)
     found += scan_list(found)
     found += scan_list(found)
@@ -92,12 +142,16 @@ def worker():
     logging.info("{} nodes found.".format(len(found)))
     logging.info("Detecting locations")
 
+    # Load existing known nodes
+    known_nodes = load_known_nodes()
+    
+    # Create result list, updating with info for all nodes
     result = []
-
+    
     for address in found:
         neighbors = get_neighbors(address)
         location = ip_to_location(address)
-        server_version = get_server_version(address)
+        node_info = get_node_info(address)
 
         if len(neighbors) > 0 and location is not None:
             logging.info("{} is a public node".format(address))
@@ -110,24 +164,66 @@ def worker():
                     "country": location["country_name"],
                     "city": location["city"]
                 },
-                "server_version": server_version
+                "server_version": node_info.get("server_version"),
+                "burn_block_height": node_info.get("burn_block_height"),
+                "last_seen": datetime.utcnow().isoformat()
             }
         else:
             logging.info("{} is a private node".format(address))
 
             item = {
                 "address": address,
-                "server_version": server_version
+                "server_version": node_info.get("server_version"),
+                "burn_block_height": node_info.get("burn_block_height"),
+                "last_seen": datetime.utcnow().isoformat()
             }
 
         result.append(item)
 
     save_path = os.path.join(this_dir, "..", "..", "..", "data.json")
     file_write(save_path, json.dumps(result))
-    logging.info("Saved")
+    logging.info("Saved {} nodes".format(len(result)))
+
+
+def periodic_rescan():
+    """Periodically rescan info for all known nodes"""
+    while True:
+        time.sleep(600)  # Wait 10 minutes before first rescan
+        
+        logging.info("Starting periodic rescan of known nodes")
+        known_nodes = load_known_nodes()
+        
+        if not known_nodes:
+            logging.info("No known nodes to rescan")
+            continue
+        
+        addresses = list(known_nodes.keys())
+        logging.info("Rescanning {} nodes concurrently".format(len(addresses)))
+        
+        # Fetch info for all nodes concurrently
+        updated_info = rescan_nodes_info(addresses)
+        
+        # Update known nodes with new info
+        for address, info in updated_info.items():
+            if address in known_nodes:
+                known_nodes[address].update(info)
+                known_nodes[address]["last_seen"] = datetime.utcnow().isoformat()
+        
+        # Save updated data
+        save_path = os.path.join(this_dir, "..", "..", "..", "data.json")
+        result = list(known_nodes.values())
+        file_write(save_path, json.dumps(result))
+        logging.info("Periodic rescan completed, saved {} nodes".format(len(result)))
 
 
 def main():
+    import threading
+    
+    # Start periodic rescan in a background thread
+    rescan_thread = threading.Thread(target=periodic_rescan, daemon=True)
+    rescan_thread.start()
+    
+    # Run initial discovery and periodic full scans
     while True:
         worker()
         time.sleep(120)
