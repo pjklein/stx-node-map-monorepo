@@ -52,7 +52,9 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                                     <th>IP Address</th>
                                                     <th>Country</th>
                                                     <th>City</th>
-                                                    <th>Coordinates</th>
+                                                    <th>Server Version</th>
+                                                    <th>Burn Block Height</th>
+                                                    <th>Last Seen</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -66,7 +68,17 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                                         <td>{node.location?.city || '-'}</td>
                                                         <td>
                                                             <small className="text-muted">
-                                                                {node.location?.lat.toFixed(2)}, {node.location?.lng.toFixed(2)}
+                                                                {node.server_version || '-'}
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <small className="text-muted">
+                                                                {node.burn_block_height || '-'}
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <small className="text-muted">
+                                                                {node.last_seen ? new Date(node.last_seen).toLocaleString() : '-'}
                                                             </small>
                                                         </td>
                                                         <td>
@@ -97,6 +109,9 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                             <thead className="table-light">
                                                 <tr>
                                                     <th>IP Address</th>
+                                                    <th>Server Version</th>
+                                                    <th>Burn Block Height</th>
+                                                    <th>Last Seen</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -105,6 +120,21 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                                     <tr key={i}>
                                                         <td>
                                                             <code className="text-secondary">{node.address}</code>
+                                                        </td>
+                                                        <td>
+                                                            <small className="text-muted">
+                                                                {node.server_version || '-'}
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <small className="text-muted">
+                                                                {node.burn_block_height || '-'}
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <small className="text-muted">
+                                                                {node.last_seen ? new Date(node.last_seen).toLocaleString() : '-'}
+                                                            </small>
                                                         </td>
                                                         <td>
                                                             <a

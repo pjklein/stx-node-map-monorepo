@@ -6,6 +6,9 @@ export interface Node {
         country: string;
         city: string;
     }
+    server_version?: string;
+    burn_block_height?: number;
+    last_seen?: string;
 }
 
 export interface ApiResponse {
