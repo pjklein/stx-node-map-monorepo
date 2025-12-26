@@ -6,8 +6,6 @@ import {Node} from "../../types";
 
 import {DivIcon, DivIconOptions} from "leaflet";
 
-const FullscreenControl = require("react-leaflet-fullscreen");
-
 interface Props {
     nodes: Node[];
     loading?: boolean;
@@ -79,7 +77,6 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                 </Popup>
                             </Marker>
                         })}
-                        <FullscreenControl position="topright" />
                     </Map>
                 </div>
             </div>

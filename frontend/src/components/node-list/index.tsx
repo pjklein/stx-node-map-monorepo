@@ -9,7 +9,7 @@ interface Props {
     loading?: boolean;
 }
 
-type SortField = 'address' | 'country' | 'city' | 'major' | 'minor' | 'patch' | 'build' | 'burn_block_height';
+type SortField = 'address' | 'country' | 'city' | 'version' | 'commit_hash' | 'build_type' | 'platform' | 'burn_block_height';
 type SortOrder = 'asc' | 'desc';
 
 const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading = false }) => {
@@ -33,8 +33,9 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
             (node.location?.country?.toLowerCase().includes(searchTerm.toLowerCase()))
         );
 
+        // Apply version filter
         if (versionFilterMajor) {
-            filtered = filtered.filter(node => node.version?.major === versionFilterMajor);
+            filtered = filtered.filter(node => node.version?.version === versionFilterMajor);
         }
 
         const sorted = [...filtered].sort((a, b) => {
@@ -54,21 +55,21 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                     aVal = a.location?.city || '';
                     bVal = b.location?.city || '';
                     break;
-                case 'major':
-                    aVal = parseInt(a.version?.major || '0');
-                    bVal = parseInt(b.version?.major || '0');
+                case 'version':
+                    aVal = a.version?.version || '';
+                    bVal = b.version?.version || '';
                     break;
-                case 'minor':
-                    aVal = parseInt(a.version?.minor || '0');
-                    bVal = parseInt(b.version?.minor || '0');
+                case 'commit_hash':
+                    aVal = a.version?.commit_hash || '';
+                    bVal = b.version?.commit_hash || '';
                     break;
-                case 'patch':
-                    aVal = parseInt(a.version?.patch || '0');
-                    bVal = parseInt(b.version?.patch || '0');
+                case 'build_type':
+                    aVal = a.version?.build_type || '';
+                    bVal = b.version?.build_type || '';
                     break;
-                case 'build':
-                    aVal = parseInt(a.version?.build || '0');
-                    bVal = parseInt(b.version?.build || '0');
+                case 'platform':
+                    aVal = a.version?.platform || '';
+                    bVal = b.version?.platform || '';
                     break;
                 case 'burn_block_height':
                     aVal = a.burn_block_height || 0;
@@ -91,8 +92,8 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
         return sortOrder === 'asc' ? ' ↑' : ' ↓';
     };
 
-    const getUniqueMajorVersions = () => {
-        const versions = new Set(nodes.map(n => n.version?.major).filter(v => v));
+    const getUniqueVersions = () => {
+        const versions = new Set(nodes.map(n => n.version?.version).filter(v => v));
         return Array.from(versions).sort();
     };
 
@@ -121,9 +122,9 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                 value={versionFilterMajor}
                                 onChange={(e) => setVersionFilterMajor(e.target.value)}
                             >
-                                <option value="">All Major Versions</option>
-                                {getUniqueMajorVersions().map(v => (
-                                    <option key={v} value={v}>Major v{v}</option>
+                                <option value="">All Versions</option>
+                                {getUniqueVersions().map(v => (
+                                    <option key={v} value={v}>v{v}</option>
                                 ))}
                             </select>
                         </div>
@@ -151,17 +152,17 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                         <th style={{cursor: 'pointer'}} onClick={() => handleSort('city')}>
                                             City{getSortIndicator('city')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('major')}>
-                                            Maj{getSortIndicator('major')}
+                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('version')}>
+                                            Version{getSortIndicator('version')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('minor')}>
-                                            Min{getSortIndicator('minor')}
+                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('commit_hash')}>
+                                            Commit{getSortIndicator('commit_hash')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('patch')}>
-                                            Patch{getSortIndicator('patch')}
+                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('build_type')}>
+                                            Build Type{getSortIndicator('build_type')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('build')}>
-                                            Build{getSortIndicator('build')}
+                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('platform')}>
+                                            Platform{getSortIndicator('platform')}
                                         </th>
                                         <th style={{cursor: 'pointer'}} onClick={() => handleSort('burn_block_height')}>
                                             Burn Height{getSortIndicator('burn_block_height')}
@@ -177,10 +178,10 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                             </td>
                                             <td>{node.location?.country || '-'}</td>
                                             <td>{node.location?.city || '-'}</td>
-                                            <td>{node.version?.major || '-'}</td>
-                                            <td>{node.version?.minor || '-'}</td>
-                                            <td>{node.version?.patch || '-'}</td>
-                                            <td>{node.version?.build || '-'}</td>
+                                            <td><code>{node.version?.version || '-'}</code></td>
+                                            <td><code className="text-muted">{node.version?.commit_hash || '-'}</code></td>
+                                            <td><small>{node.version?.build_type || '-'}</small></td>
+                                            <td><small className="text-muted">{node.version?.platform || '-'}</small></td>
                                             <td>{node.burn_block_height ? node.burn_block_height.toLocaleString() : '-'}</td>
                                             <td>
                                                 <a

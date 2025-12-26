@@ -8,10 +8,10 @@ export interface Node {
     }
     server_version?: string;
     version?: {
-        major?: string;
-        minor?: string;
-        patch?: string;
-        build?: string;
+        version?: string;
+        commit_hash?: string;
+        build_type?: string;
+        platform?: string;
     };
     burn_block_height?: number;
     last_seen?: string;

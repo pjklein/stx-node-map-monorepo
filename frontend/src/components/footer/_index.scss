@@ -1,0 +1,63 @@
+.discovery-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    border-top: 1px solid #34495e;
+    z-index: 100;
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            
+            &.scanning {
+                background: #3498db;
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+            
+            &.idle {
+                background: #2ecc71;
+            }
+        }
+
+        .status-text {
+            font-weight: 500;
+        }
+    }
+
+    .status-info {
+        display: flex;
+        gap: 16px;
+        
+        .nodes-count {
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .last-scan {
+            color: #95a5a6;
+        }
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+}
