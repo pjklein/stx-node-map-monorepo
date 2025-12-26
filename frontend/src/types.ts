@@ -7,6 +7,12 @@ export interface Node {
         city: string;
     }
     server_version?: string;
+    version?: {
+        major?: string;
+        minor?: string;
+        patch?: string;
+        build?: string;
+    };
     burn_block_height?: number;
     last_seen?: string;
 }
