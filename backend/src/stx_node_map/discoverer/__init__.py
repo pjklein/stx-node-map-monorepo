@@ -35,6 +35,20 @@ def ip_to_location(ip: str):
     }
 
 
+def parse_server_version(version_str):
+    """Parse server version string into components (e.g., '2.0.5.1' -> {'major': '2', 'minor': '0', 'patch': '5', 'build': '1'})"""
+    if not version_str:
+        return {"major": None, "minor": None, "patch": None, "build": None}
+    
+    parts = str(version_str).split('.')
+    return {
+        "major": parts[0] if len(parts) > 0 else None,
+        "minor": parts[1] if len(parts) > 1 else None,
+        "patch": parts[2] if len(parts) > 2 else None,
+        "build": parts[3] if len(parts) > 3 else None
+    }
+
+
 def should_fetch_geolocation(known_nodes: dict, ip: str) -> bool:
     """Check if we should fetch geolocation for this IP (only once per month)"""
     if ip not in known_nodes:
@@ -192,6 +206,9 @@ def worker():
         if len(neighbors) > 0 and location is not None:
             logging.info("{} is a public node".format(address))
 
+            server_version = node_info.get("server_version")
+            version_parts = parse_server_version(server_version)
+            
             item = {
                 "address": address,
                 "location": {
@@ -200,7 +217,8 @@ def worker():
                     "country": location["country_name"],
                     "city": location["city"]
                 },
-                "server_version": node_info.get("server_version"),
+                "server_version": server_version,
+                "version": version_parts,
                 "burn_block_height": node_info.get("burn_block_height"),
                 "last_seen": datetime.utcnow().isoformat(),
                 "location_fetched_at": datetime.utcnow().isoformat()
@@ -208,9 +226,13 @@ def worker():
         else:
             logging.info("{} is a private node".format(address))
 
+            server_version = node_info.get("server_version")
+            version_parts = parse_server_version(server_version)
+            
             item = {
                 "address": address,
-                "server_version": node_info.get("server_version"),
+                "server_version": server_version,
+                "version": version_parts,
                 "burn_block_height": node_info.get("burn_block_height"),
                 "last_seen": datetime.utcnow().isoformat()
             }
