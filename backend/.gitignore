@@ -5,3 +5,5 @@ venv
 env.sh
 *.log
 data.json
+status.json
+logs/
