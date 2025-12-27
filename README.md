@@ -4,7 +4,7 @@ A full-stack application for visualizing Stacks (STX) nodes on a map with real-t
 
 ## Project Structure
 
-```
+```text
 stx-node-map-monorepo/
 ├── frontend/          # React TypeScript web application
 │   ├── src/
@@ -67,6 +67,7 @@ yarn start              # For development (http://localhost:3000)
 Returns all nodes with their geolocation data.
 
 **Response:**
+
 ```json
 {
   "network": "mainnet",
@@ -88,9 +89,11 @@ Returns all nodes with their geolocation data.
 ## Environment Variables
 
 ### Backend
+
 - `NETWORK`: Network identifier (e.g., "mainnet", "testnet")
 
 ### Frontend
+
 - `REACT_APP_API_URL`: Backend API URL (default: `http://localhost:8089`)
 
 ## Development
@@ -106,6 +109,7 @@ python run.py api
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 cd frontend
 yarn start
@@ -115,7 +119,8 @@ Then visit `http://localhost:3000`
 
 ## Technologies
 
-### Frontend
+### Frontend Stack
+
 - React 17
 - TypeScript
 - React Bootstrap
@@ -123,7 +128,8 @@ Then visit `http://localhost:3000`
 - React CountUp (animations)
 - Sass/SCSS
 
-### Backend
+### Backend Stack
+
 - Flask
 - Flask-CORS
 - Python 3
