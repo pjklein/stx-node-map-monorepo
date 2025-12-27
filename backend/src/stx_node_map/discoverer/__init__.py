@@ -26,10 +26,20 @@ def ip_to_location(ip: str):
         return None
 
     data = resp.json()
+    
+    # Safely convert coordinates, handling "nil" or invalid values
+    try:
+        lat = data.get("latitude", 0)
+        lon = data.get("longitude", 0)
+        latitude = float(lat) if lat not in (None, "", "nil") else 0.0
+        longitude = float(lon) if lon not in (None, "", "nil") else 0.0
+    except (ValueError, TypeError):
+        return None
+    
     # Map GeoJS response to our format
     return {
-        "latitude": float(data.get("latitude", 0)),
-        "longitude": float(data.get("longitude", 0)),
+        "latitude": latitude,
+        "longitude": longitude,
         "country_name": data.get("country", ""),
         "city": data.get("city", "")
     }
