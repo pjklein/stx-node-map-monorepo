@@ -3,7 +3,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-bottom: 50px; /* Space for fixed footer */
+  padding-bottom: 60px; /* Space for fixed footer */
 }
 
 .App-logo {

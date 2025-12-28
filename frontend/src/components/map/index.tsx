@@ -39,7 +39,7 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                     <h5 className="mb-0">📍 Node Distribution Map ({publicCount} geo-located nodes)</h5>
                 </div>
                 <div className="card-body p-0">
-                    <Map center={center} zoom={2} className="the-map" style={{ height: '600px', width: '100%' }}>
+                    <Map center={center} zoom={2} className="the-map" style={{ height: '500px', width: '100%' }}>
                         <TileLayer
                             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
