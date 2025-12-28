@@ -45,20 +45,6 @@ def ip_to_location(ip: str):
     }
 
 
-def parse_server_version(version_str):
-    """Parse server version string into components (e.g., '2.0.5.1' -> {'major': '2', 'minor': '0', 'patch': '5', 'build': '1'})"""
-    if not version_str:
-        return {"major": None, "minor": None, "patch": None, "build": None}
-    
-    parts = str(version_str).split('.')
-    return {
-        "major": parts[0] if len(parts) > 0 else None,
-        "minor": parts[1] if len(parts) > 1 else None,
-        "patch": parts[2] if len(parts) > 2 else None,
-        "build": parts[3] if len(parts) > 3 else None
-    }
-
-
 def should_fetch_geolocation(known_nodes: dict, ip: str) -> bool:
     """Check if we should fetch geolocation for this IP (only once per month)"""
     if ip not in known_nodes:
@@ -92,16 +78,67 @@ def get_server_version(host: str):
 
 
 def get_node_info(host: str):
-    """Fetch /v2/info for a node and extract server_version and burn_block_height"""
+    """Fetch /v2/info for a node and extract version details and burn_block_height"""
     url = make_core_api_url(host, "info")
     try:
         resp = requests.get(url, timeout=4).json()
+        
+        # Parse server_version string (e.g., "stacks-node 2.5.0.0.0 (master:abc123, release, linux [x86_64])")
+        server_version = resp.get("server_version", "")
+        version_info = {
+            "version": None,
+            "commit_hash": None,
+            "build_type": None,
+            "platform": None
+        }
+        
+        if server_version:
+            # Extract version number - find the numeric version part after "stacks-node "
+            # Example: "stacks-node 3.3.0.0.3 (6048975+, release build, linux [x86_64])"
+            parts = server_version.split()
+            for part in parts:
+                # Look for a part that starts with a digit (version number)
+                if part and part[0].isdigit():
+                    # Extract just the version, removing any trailing parenthesis
+                    version_info["version"] = part.split("(")[0]
+                    break
+            
+            # Extract commit, build type, and platform from parentheses
+            if "(" in server_version and ")" in server_version:
+                paren_content = server_version[server_version.find("(")+1:server_version.find(")")]
+                paren_parts = [p.strip() for p in paren_content.split(",")]
+                
+                if len(paren_parts) > 0 and paren_parts[0]:
+                    # Commit hash (e.g., "master:abc123" or "abc123" or "6048975+")
+                    commit_part = paren_parts[0]
+                    if ":" in commit_part:
+                        version_info["commit_hash"] = commit_part.split(":")[1]
+                    else:
+                        version_info["commit_hash"] = commit_part
+                
+                # Build type might be "release build" or just "release"
+                for part in paren_parts[1:]:
+                    if "release" in part.lower() or "debug" in part.lower():
+                        version_info["build_type"] = part
+                        break
+                
+                # Platform is usually the last part with brackets
+                for part in paren_parts:
+                    if "[" in part and "]" in part:
+                        version_info["platform"] = part
+                        break
+        
         return {
-            "server_version": resp.get("server_version"),
+            "server_version": server_version,
+            "version": version_info,
             "burn_block_height": resp.get("burn_block_height")
         }
     except BaseException:
-        return {"server_version": None, "burn_block_height": None}
+        return {
+            "server_version": None,
+            "version": {"version": None, "commit_hash": None, "build_type": None, "platform": None},
+            "burn_block_height": None
+        }
 
 
 def get_neighbors(host: str):
@@ -144,10 +181,15 @@ def rescan_nodes_info(addresses):
             try:
                 info = future.result()
                 results[address] = info
-                logging.info("Updated info for {}: v{}".format(address, info.get("server_version", "unknown")))
+                version_str = info.get("version", {}).get("version", "unknown")
+                logging.info("Updated info for {}: v{}".format(address, version_str))
             except Exception as e:
                 logging.error("Error fetching info for {}: {}".format(address, e))
-                results[address] = {"server_version": None, "burn_block_height": None}
+                results[address] = {
+                    "server_version": None,
+                    "version": {"version": None, "commit_hash": None, "build_type": None, "platform": None},
+                    "burn_block_height": None
+                }
     
     return results
 
@@ -167,6 +209,23 @@ def load_known_nodes():
         return {}
 
 
+def check_schema_version(known_nodes):
+    """Check if data.json has old schema (major/minor/patch/build) vs new (version/commit_hash/build_type/platform)"""
+    if not known_nodes:
+        return True  # Empty or no data, schema is fine
+    
+    # Check first node for old schema indicators
+    sample_node = next(iter(known_nodes.values()))
+    version_data = sample_node.get("version", {})
+    
+    # Old schema has major/minor/patch/build
+    if "major" in version_data or "minor" in version_data:
+        logging.warning("⚠️  Detected old schema in data.json - triggering full rescan")
+        return False
+    
+    return True
+
+
 def write_status(status, nodes_count=0, scanning=False, last_scan=None):
     """Write discovery status to status.json"""
     status_path = os.path.join(this_dir, "..", "..", "..", "status.json")
@@ -182,6 +241,14 @@ def write_status(status, nodes_count=0, scanning=False, last_scan=None):
 
 def worker():
     write_status("Starting discovery walk", scanning=True)
+    
+    # Check if schema is outdated
+    known_nodes = load_known_nodes()
+    schema_valid = check_schema_version(known_nodes)
+    
+    if not schema_valid:
+        logging.info("🔄 Schema migration needed - performing full network scan")
+        known_nodes = {}  # Clear cached data to force fresh scan
     
     seed_nodes = assert_env_vars("DISCOVERER_SEED_NODES").split(",")
     seed = []
@@ -208,8 +275,8 @@ def worker():
     logging.info("Detecting locations")
     write_status("Fetching geolocation", len(found), scanning=True)
 
-    # Load existing known nodes
-    known_nodes = load_known_nodes()
+    # known_nodes was already loaded and validated at start of worker()
+    # If schema was invalid, it was cleared to force fresh geolocation
     
     # Create result list, updating with info for all nodes
     result = []
@@ -250,14 +317,11 @@ def worker():
         is_public = len(neighbors) > 0
         node_type = "public" if is_public else "private"
         
-        server_version = node_info.get("server_version")
-        version_parts = parse_server_version(server_version)
-        
         # Build base item with info available to all nodes
         item = {
             "address": address,
-            "server_version": server_version,
-            "version": version_parts,
+            "server_version": node_info.get("server_version"),
+            "version": node_info.get("version"),
             "burn_block_height": node_info.get("burn_block_height"),
             "last_seen": datetime.utcnow().isoformat(),
             "node_type": node_type
