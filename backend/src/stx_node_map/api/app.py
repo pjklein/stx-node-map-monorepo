@@ -57,7 +57,7 @@ def __run_dev_server():
     app.config['DEVELOPMENT'] = True
     app.config['DEBUG'] = True
 
-    app.run(host='127.0.0.1', port=8089)
+    app.run(host='0.0.0.0', port=8089)
 
 
 __flask_setup()

@@ -214,6 +214,12 @@ def worker():
     # Create result list, updating with info for all nodes
     result = []
     geolocation_calls = 0
+    geolocation_successes = 0
+    geolocation_failures = 0
+    
+    # Log geolocation attempts
+    geoloc_log = os.path.join(this_dir, "..", "..", "..", "logs", "geolocation.log")
+    os.makedirs(os.path.dirname(geoloc_log), exist_ok=True)
     
     for address in found:
         neighbors = get_neighbors(address)
@@ -224,52 +230,74 @@ def worker():
         if should_fetch_geolocation(known_nodes, address):
             location = ip_to_location(address)
             geolocation_calls += 1
-            logging.info("Fetched geolocation for {}".format(address))
+            if location is not None:
+                geolocation_successes += 1
+                logging.info("✓ Fetched geolocation for {}: {}, {}".format(address, location["city"], location["country_name"]))
+                with open(geoloc_log, "a") as f:
+                    f.write("{} | {} | SUCCESS | {}, {}\n".format(datetime.utcnow().isoformat(), address, location["city"], location["country_name"]))
+            else:
+                geolocation_failures += 1
+                logging.warning("✗ Failed geolocation for {}".format(address))
+                with open(geoloc_log, "a") as f:
+                    f.write("{} | {} | FAILURE\n".format(datetime.utcnow().isoformat(), address))
         else:
             # Use cached location if available
             if address in known_nodes and "location" in known_nodes[address]:
                 location = known_nodes[address]["location"]
                 logging.info("Using cached location for {}".format(address))
 
-        if len(neighbors) > 0 and location is not None:
-            logging.info("{} is a public node".format(address))
-
-            server_version = node_info.get("server_version")
-            version_parts = parse_server_version(server_version)
-            
-            item = {
-                "address": address,
-                "location": {
-                    "lat": location["latitude"],
-                    "lng": location["longitude"],
-                    "country": location["country_name"],
-                    "city": location["city"]
-                },
-                "server_version": server_version,
-                "version": version_parts,
-                "burn_block_height": node_info.get("burn_block_height"),
-                "last_seen": datetime.utcnow().isoformat(),
-                "location_fetched_at": datetime.utcnow().isoformat()
+        # Determine node type based on neighbors
+        is_public = len(neighbors) > 0
+        node_type = "public" if is_public else "private"
+        
+        server_version = node_info.get("server_version")
+        version_parts = parse_server_version(server_version)
+        
+        # Build base item with info available to all nodes
+        item = {
+            "address": address,
+            "server_version": server_version,
+            "version": version_parts,
+            "burn_block_height": node_info.get("burn_block_height"),
+            "last_seen": datetime.utcnow().isoformat(),
+            "node_type": node_type
+        }
+        
+        # Add location if available (for both public and private nodes)
+        if location is not None:
+            item["location"] = {
+                "lat": location["latitude"],
+                "lng": location["longitude"],
+                "country": location["country_name"] if location["country_name"] else "Unknown",
+                "city": location["city"] if location["city"] else ""
             }
+            item["location_fetched_at"] = datetime.utcnow().isoformat()
+            logging.info("{} is a {} node with location".format(address, node_type))
+        elif not is_public:
+            # Private node without geolocation - mark as "Private"
+            item["location"] = {
+                "lat": 0.0,
+                "lng": 0.0,
+                "country": "Private",
+                "city": ""
+            }
+            logging.info("{} is a private node (no geolocation attempted)".format(address))
         else:
-            logging.info("{} is a private node".format(address))
-
-            server_version = node_info.get("server_version")
-            version_parts = parse_server_version(server_version)
-            
-            item = {
-                "address": address,
-                "server_version": server_version,
-                "version": version_parts,
-                "burn_block_height": node_info.get("burn_block_height"),
-                "last_seen": datetime.utcnow().isoformat()
+            # Public node but geolocation failed - mark as "Unknown"
+            item["location"] = {
+                "lat": 0.0,
+                "lng": 0.0,
+                "country": "Unknown",
+                "city": ""
             }
+            logging.info("{} is a public node but geolocation failed".format(address))
 
         result.append(item)
 
     save_path = os.path.join(this_dir, "..", "..", "..", "data.json")
     file_write(save_path, json.dumps(result))
-    logging.info("Saved {} nodes (made {} geolocation API calls)".format(len(result), geolocation_calls))
+    logging.info("Saved {} nodes (made {} geolocation API calls, {} success, {} failures)".format(
+        len(result), geolocation_calls, geolocation_successes, geolocation_failures))
 
 
 def periodic_rescan():
