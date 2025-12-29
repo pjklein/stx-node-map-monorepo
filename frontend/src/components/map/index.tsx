@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 
 import {Map, Marker, Popup, TileLayer} from "react-leaflet";
 
@@ -12,17 +12,22 @@ interface Props {
 }
 
 const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
-    const center = { lat: 20.00, lng: 12.00 };
+    const [viewport, setViewport] = useState({ center: { lat: 20.00, lng: 12.00 }, zoom: 2 });
+    const mapRef = useRef<any>(null);
     const publicCount = nodes.filter(x => x.location && x.location.country !== "Unknown" && x.location.country !== "Private").length;
 
     const iconProps: DivIconOptions = {
         className: "map-marker-icon",
-        iconSize: [24, 34],
-        iconAnchor: [12, 34],
-        popupAnchor: [0, -20],
+        iconSize: [12, 17],
+        iconAnchor: [6, 17],
+        popupAnchor: [0, -10],
         html: "<img alt='Marker' src='/marker.png' />"
     }
     const icon = new DivIcon(iconProps);
+
+    const handleViewportChanged = (viewport: any) => {
+        setViewport(viewport);
+    };
 
     if (loading) {
         return <div className="card shadow-sm p-5 text-center">
@@ -39,7 +44,14 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                     <h5 className="mb-0">📍 Node Distribution Map ({publicCount} geo-located nodes)</h5>
                 </div>
                 <div className="card-body p-0">
-                    <Map center={center} zoom={2} className="the-map" style={{ height: '500px', width: '100%' }}>
+                    <Map 
+                        ref={mapRef}
+                        center={viewport.center} 
+                        zoom={viewport.zoom} 
+                        className="the-map" 
+                        style={{ height: '500px', width: '100%' }}
+                        onViewportChanged={handleViewportChanged}
+                    >
                         <TileLayer
                             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
