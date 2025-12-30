@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 import {Map, Marker, Popup, TileLayer} from "react-leaflet";
 
@@ -13,7 +13,6 @@ interface Props {
 
 const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
     const mapRef = useRef<any>(null);
-    const [viewport, setViewport] = useState<any>({ center: [20.00, 12.00], zoom: 2 });
     const publicCount = nodes.filter(x => x.location && x.location.country !== "Unknown" && x.location.country !== "Private").length;
 
     const iconProps: DivIconOptions = {
@@ -41,12 +40,16 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                 </div>
                 <div className="card-body p-0">
                     <Map 
+                        key="main-map"
                         ref={mapRef}
-                        center={viewport.center} 
-                        zoom={viewport.zoom} 
+                        center={[20.00, 12.00]} 
+                        zoom={2}
+                        dragging={true}
+                        touchZoom={true}
+                        scrollWheelZoom={true}
+                        doubleClickZoom={true}
                         className="the-map" 
                         style={{ height: '500px', width: '100%' }}
-                        onViewportChanged={setViewport}
                     >
                         <TileLayer
                             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'

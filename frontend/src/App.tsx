@@ -40,7 +40,7 @@ function App() {
 
     useEffect(() => {
         load();
-        const interval = setInterval(load, 30000);
+        const interval = setInterval(load, 300000); // 5 minutes
         return () => clearInterval(interval);
     }, []);
 
