@@ -9,7 +9,11 @@ import requests
 
 from stx_node_map.util import file_write, assert_env_vars
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,7 +29,10 @@ def ip_to_location(ip: str):
     if resp.status_code != 200:
         return None
 
-    data = resp.json()
+    try:
+        data = resp.json()
+    except:
+        return None
     
     # Safely convert coordinates, handling "nil" or invalid values
     try:
@@ -36,7 +43,10 @@ def ip_to_location(ip: str):
     except (ValueError, TypeError):
         return None
     
-    # Map GeoJS response to our format
+    # Map GeoJS response to our format - return None if essential data is missing
+    if not data.get("country") and latitude == 0.0 and longitude == 0.0:
+        return None
+    
     return {
         "latitude": latitude,
         "longitude": longitude,
@@ -81,7 +91,7 @@ def get_node_info(host: str):
     """Fetch /v2/info for a node and extract version details and burn_block_height"""
     url = make_core_api_url(host, "info")
     try:
-        resp = requests.get(url, timeout=4).json()
+        resp = requests.get(url, timeout=10).json()
         
         # Parse server_version string (e.g., "stacks-node 2.5.0.0.0 (master:abc123, release, linux [x86_64])")
         server_version = resp.get("server_version", "")
@@ -367,7 +377,7 @@ def worker():
 def periodic_rescan():
     """Periodically rescan info for all known nodes"""
     while True:
-        time.sleep(600)  # Wait 10 minutes before first rescan
+        time.sleep(300)  # Wait 5 minutes before first rescan
         
         logging.info("Starting periodic rescan of known nodes")
         write_status("Periodic rescan", scanning=True)
@@ -379,7 +389,7 @@ def periodic_rescan():
             continue
         
         addresses = list(known_nodes.keys())
-        logging.info("Rescanning {} nodes concurrently".format(len(addresses)))
+        logging.info("Rescanning {} nodes concurrently with 10s timeout".format(len(addresses)))
         
         # Fetch info for all nodes concurrently
         updated_info = rescan_nodes_info(addresses)
@@ -395,7 +405,6 @@ def periodic_rescan():
         result = list(known_nodes.values())
         file_write(save_path, json.dumps(result))
         logging.info("Periodic rescan completed, saved {} nodes".format(len(result)))
-        write_status("Idle", len(result), scanning=False)
         write_status("Idle", len(result), scanning=False)
 
 

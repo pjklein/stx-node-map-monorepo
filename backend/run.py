@@ -3,7 +3,11 @@ import os
 import sys
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 assert sys.version_info[0] == 3 and sys.version_info[1] >= 6, 'Requires Python 3.6 or newer'
 
