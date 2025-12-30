@@ -60,6 +60,11 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                 return null;
                             }
 
+                            // Skip nodes at 0,0 (Unknown locations)
+                            if (node.location.lat === 0 && node.location.lng === 0) {
+                                return null;
+                            }
+
                             // Search for nodes on same location
                             const rNodes = nodes.filter(x => x.location && (x.location.lng === node.location!.lng && x.location.lat === node.location!.lat));
 
