@@ -13,7 +13,7 @@ interface Props {
 
 const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
     const mapRef = useRef<any>(null);
-    const publicCount = nodes.filter(x => x.location && x.location.country !== "Unknown" && x.location.country !== "Private").length;
+    const publicCount = nodes.filter(x => x.location && x.location.country !== "Unknown" && x.location.country !== "Private IP").length;
 
     const iconProps: DivIconOptions = {
         className: "map-marker-icon",

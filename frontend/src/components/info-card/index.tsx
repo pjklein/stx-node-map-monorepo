@@ -12,8 +12,8 @@ interface Props {
 
 const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
     const totalNodes = nodes.length;
-    const nodesWithLocation = nodes.filter(n => n.location && n.location.country !== "Unknown" && n.location.country !== "Private").length;
-    const uniqueCountries = new Set(nodes.filter(n => n.location && n.location.country !== "Unknown" && n.location.country !== "Private").map(n => n.location?.country)).size;
+    const nodesWithLocation = nodes.filter(n => n.location && n.location.country !== "Unknown" && n.location.country !== "Private IP").length;
+    const uniqueCountries = new Set(nodes.filter(n => n.location && n.location.country !== "Unknown" && n.location.country !== "Private IP").map(n => n.location?.country)).size;
 
     return <div className="row mb-4">
         <div className="col-md-3 mb-2">
