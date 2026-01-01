@@ -1,4 +1,4 @@
-.PHONY: cpr commit push run clean
+.PHONY: cpr commit push run clean cleannodecache cleannodeinfo
 
 # Default commit message (override with: make cpr MSG='your message')
 MSG ?= chore: update project
@@ -40,3 +40,13 @@ clean:
 	@(pkill -9 -f "node.*react") > /dev/null 2>&1 &
 	@sleep 1
 	@echo "✅ Services stopped"
+
+cleannodecache:
+	@echo "🗑️  Clearing node cache (data.json)..."
+	@rm -f backend/data.json
+	@echo "✅ Node cache cleared - next run will do full discovery"
+
+cleannodeinfo:
+	@echo "🔄 Refreshing node info without network walk..."
+	@(cd backend && bash -c 'source env.sh && .venv/bin/python run.py rescan')
+	@echo "✅ Node info refreshed"
