@@ -339,14 +339,30 @@ def worker():
         
         # Add location if available (for both public and private nodes)
         if location is not None:
-            item["location"] = {
-                "lat": location["latitude"],
-                "lng": location["longitude"],
-                "country": location["country_name"] if location["country_name"] else "Unknown",
-                "city": location["city"] if location["city"] else ""
-            }
-            item["location_fetched_at"] = datetime.utcnow().isoformat()
-            logging.info("{} is a {} node with location".format(address, node_type))
+            try:
+                # Handle both new format (latitude/longitude) and cached format (lat/lng)
+                lat = location.get("latitude") or location.get("lat", 0.0)
+                lng = location.get("longitude") or location.get("lng", 0.0)
+                country = location.get("country_name") or location.get("country", "Unknown")
+                city = location.get("city", "")
+                
+                item["location"] = {
+                    "lat": lat,
+                    "lng": lng,
+                    "country": country if country else "Unknown",
+                    "city": city if city else ""
+                }
+                item["location_fetched_at"] = datetime.utcnow().isoformat()
+                logging.info("{} is a {} node with location".format(address, node_type))
+            except Exception as e:
+                logging.error("Error processing location for {}: {}".format(address, e))
+                # Fall back to Unknown location
+                item["location"] = {
+                    "lat": 0.0,
+                    "lng": 0.0,
+                    "country": "Unknown",
+                    "city": ""
+                }
         elif not is_public:
             # Private node without geolocation - mark as "Private"
             item["location"] = {
