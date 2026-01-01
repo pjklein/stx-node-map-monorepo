@@ -19,6 +19,7 @@ def main():
     cmd_list = (
         'api',
         'discoverer',
+        'rescan',
     )
 
     parser.add_argument('cmd', choices=cmd_list, nargs='?', default='')
@@ -33,6 +34,10 @@ def main():
     if cmd == 'discoverer':
         from stx_node_map.discoverer import main
         main()
+
+    if cmd == 'rescan':
+        from stx_node_map.discoverer import rescan_only
+        rescan_only()
 
 
 if __name__ == '__main__':

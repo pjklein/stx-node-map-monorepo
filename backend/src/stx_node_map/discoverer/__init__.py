@@ -18,6 +18,42 @@ logging.basicConfig(
 this_dir = os.path.abspath(os.path.dirname(__file__))
 
 
+def is_private_ip(ip: str) -> bool:
+    """Check if an IP address is private (RFC 1918) or special use"""
+    try:
+        parts = [int(x) for x in ip.split('.')]
+        if len(parts) != 4:
+            return True  # Invalid format, skip
+        
+        # 10.0.0.0/8
+        if parts[0] == 10:
+            return True
+        
+        # 172.16.0.0/12
+        if parts[0] == 172 and 16 <= parts[1] <= 31:
+            return True
+        
+        # 192.168.0.0/16
+        if parts[0] == 192 and parts[1] == 168:
+            return True
+        
+        # 127.0.0.0/8 (localhost)
+        if parts[0] == 127:
+            return True
+        
+        # 169.254.0.0/16 (link-local)
+        if parts[0] == 169 and parts[1] == 254:
+            return True
+        
+        # 0.0.0.0
+        if parts[0] == 0:
+            return True
+        
+        return False
+    except:
+        return True  # Invalid IP, skip
+
+
 def ip_to_location(ip: str):
     """Fetch geolocation from GeoJS.io (unlimited calls, no rate limits)"""
     url = "https://get.geojs.io/v1/geo/{}.json".format(ip)
@@ -164,8 +200,8 @@ def get_neighbors(host: str):
     # make the list unique
     unique = list(set(all_))
 
-    # skip local address
-    return [a for a in unique if a != "0.0.0.0"]
+    # skip private addresses
+    return [a for a in unique if not is_private_ip(a)]
 
 
 def scan_list(list_):
@@ -302,26 +338,37 @@ def worker():
         neighbors = get_neighbors(address)
         node_info = get_node_info(address)
         
-        # Check if we should fetch geolocation (only once per month)
-        location = None
-        if should_fetch_geolocation(known_nodes, address):
-            location = ip_to_location(address)
-            geolocation_calls += 1
-            if location is not None:
-                geolocation_successes += 1
-                logging.info("✓ Fetched geolocation for {}: {}, {}".format(address, location["city"], location["country_name"]))
-                with open(geoloc_log, "a") as f:
-                    f.write("{} | {} | SUCCESS | {}, {}\n".format(datetime.utcnow().isoformat(), address, location["city"], location["country_name"]))
-            else:
-                geolocation_failures += 1
-                logging.warning("✗ Failed geolocation for {}".format(address))
-                with open(geoloc_log, "a") as f:
-                    f.write("{} | {} | FAILURE\n".format(datetime.utcnow().isoformat(), address))
+        # Check if this is a private IP address
+        if is_private_ip(address):
+            # Skip geolocation for private IPs
+            location = {
+                "lat": 0.0,
+                "lng": 0.0,
+                "country": "Private IP",
+                "city": ""
+            }
+            logging.info("{} is a private IP address".format(address))
         else:
-            # Use cached location if available
-            if address in known_nodes and "location" in known_nodes[address]:
-                location = known_nodes[address]["location"]
-                logging.info("Using cached location for {}".format(address))
+            # Check if we should fetch geolocation (only once per month)
+            location = None
+            if should_fetch_geolocation(known_nodes, address):
+                location = ip_to_location(address)
+                geolocation_calls += 1
+                if location is not None:
+                    geolocation_successes += 1
+                    logging.info("✓ Fetched geolocation for {}: {}, {}".format(address, location["city"], location["country_name"]))
+                    with open(geoloc_log, "a") as f:
+                        f.write("{} | {} | SUCCESS | {}, {}\n".format(datetime.utcnow().isoformat(), address, location["city"], location["country_name"]))
+                else:
+                    geolocation_failures += 1
+                    logging.warning("✗ Failed geolocation for {}".format(address))
+                    with open(geoloc_log, "a") as f:
+                        f.write("{} | {} | FAILURE\n".format(datetime.utcnow().isoformat(), address))
+            else:
+                # Use cached location if available
+                if address in known_nodes and "location" in known_nodes[address]:
+                    location = known_nodes[address]["location"]
+                    logging.info("Using cached location for {}".format(address))
 
         # Determine node type based on neighbors
         is_public = len(neighbors) > 0
@@ -364,11 +411,11 @@ def worker():
                     "city": ""
                 }
         elif not is_public:
-            # Private node without geolocation - mark as "Private"
+            # Private node without geolocation - mark as "Private IP"
             item["location"] = {
                 "lat": 0.0,
                 "lng": 0.0,
-                "country": "Private",
+                "country": "Private IP",
                 "city": ""
             }
             logging.info("{} is a private node (no geolocation attempted)".format(address))
@@ -422,6 +469,84 @@ def periodic_rescan():
         file_write(save_path, json.dumps(result))
         logging.info("Periodic rescan completed, saved {} nodes".format(len(result)))
         write_status("Idle", len(result), scanning=False)
+
+
+def rescan_only():
+    """One-time rescan of all known nodes without network walking"""
+    logging.info("Starting one-time rescan of known nodes with geolocation refresh")
+    write_status("One-time rescan", scanning=True)
+    known_nodes = load_known_nodes()
+    
+    if not known_nodes:
+        logging.info("No known nodes to rescan")
+        write_status("Idle", 0, scanning=False)
+        return
+    
+    addresses = list(known_nodes.keys())
+    logging.info("Rescanning {} nodes concurrently with 10s timeout".format(len(addresses)))
+    
+    # Fetch info for all nodes concurrently
+    updated_info = rescan_nodes_info(addresses)
+    
+    # Update known nodes with new info and refresh geolocation
+    geoloc_log = os.path.join(this_dir, "..", "..", "..", "logs", "geolocation.log")
+    os.makedirs(os.path.dirname(geoloc_log), exist_ok=True)
+    geolocation_calls = 0
+    geolocation_successes = 0
+    geolocation_failures = 0
+    
+    for address in addresses:
+        if address in known_nodes:
+            # Update v2/info data
+            if address in updated_info:
+                known_nodes[address].update(updated_info[address])
+                known_nodes[address]["last_seen"] = datetime.utcnow().isoformat()
+            
+            # Refresh geolocation
+            if is_private_ip(address):
+                # Private IP - mark as Private IP
+                known_nodes[address]["location"] = {
+                    "lat": 0.0,
+                    "lng": 0.0,
+                    "country": "Private IP",
+                    "city": ""
+                }
+                logging.info("{} is a private IP address".format(address))
+            elif should_fetch_geolocation(known_nodes, address):
+                # Fetch fresh geolocation
+                location = ip_to_location(address)
+                geolocation_calls += 1
+                if location is not None:
+                    geolocation_successes += 1
+                    known_nodes[address]["location"] = {
+                        "lat": location["latitude"],
+                        "lng": location["longitude"],
+                        "country": location["country_name"] if location["country_name"] else "Unknown",
+                        "city": location["city"] if location["city"] else ""
+                    }
+                    known_nodes[address]["location_fetched_at"] = datetime.utcnow().isoformat()
+                    logging.info("✓ Fetched geolocation for {}: {}, {}".format(address, location["city"], location["country_name"]))
+                    with open(geoloc_log, "a") as f:
+                        f.write("{} | {} | SUCCESS | {}, {}\n".format(datetime.utcnow().isoformat(), address, location["city"], location["country_name"]))
+                else:
+                    geolocation_failures += 1
+                    known_nodes[address]["location"] = {
+                        "lat": 0.0,
+                        "lng": 0.0,
+                        "country": "Unknown",
+                        "city": ""
+                    }
+                    logging.warning("✗ Failed geolocation for {}".format(address))
+                    with open(geoloc_log, "a") as f:
+                        f.write("{} | {} | FAILURE\n".format(datetime.utcnow().isoformat(), address))
+    
+    # Save updated data
+    save_path = os.path.join(this_dir, "..", "..", "..", "data.json")
+    result = list(known_nodes.values())
+    file_write(save_path, json.dumps(result))
+    logging.info("One-time rescan completed, saved {} nodes (made {} geolocation calls, {} success, {} failures)".format(
+        len(result), geolocation_calls, geolocation_successes, geolocation_failures))
+    write_status("Idle", len(result), scanning=False)
 
 
 def main():
