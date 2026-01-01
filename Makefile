@@ -29,12 +29,14 @@ run:
 	@(cd backend && bash -c 'source env.sh && .venv/bin/python run.py api' >> logs/api.log 2>&1 &) || echo "API may already be running"
 	@sleep 2
 	@echo "Starting UI..."
-	@(cd frontend && npm start >> logs/npm.log 2>&1 &) || echo "UI may already be running"
+	@(cd frontend && HOST=0.0.0.0 npm start >> logs/npm.log 2>&1 &) || echo "UI may already be running"
 	@echo "✅ All services started (check ports 8089 and 3000)"
 	@echo "📝 Logs: backend/logs/discoverer.log, backend/logs/api.log, frontend/logs/npm.log"
 
 clean:
 	@echo "🧹 Stopping services..."
-	@pkill -f "python.*run.py" || echo "No Python services running"
-	@pkill -f "npm start" || echo "No npm services running"
+	@(pkill -9 -f "python.*run.py") > /dev/null 2>&1 &
+	@(pkill -9 -f "npm start") > /dev/null 2>&1 &
+	@(pkill -9 -f "node.*react") > /dev/null 2>&1 &
+	@sleep 1
 	@echo "✅ Services stopped"
