@@ -94,7 +94,7 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
 
     const getUniqueVersions = () => {
         const versions = new Set(nodes.map(n => n.version?.version).filter(v => v));
-        return Array.from(versions).sort();
+        return Array.from(versions).sort().reverse();
     };
 
     const sortedNodes = getSortedAndFilteredNodes();

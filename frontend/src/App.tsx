@@ -28,7 +28,7 @@ function App() {
             .then(r => {
                 setNetwork(r.network);
                 setNodes(r.nodes);
-                setFilteredNodes(r.nodes);
+                // Don't set filteredNodes here - let the useEffect handle it
                 setError("");
             })
             .catch(e => {
