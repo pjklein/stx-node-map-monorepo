@@ -228,7 +228,7 @@ def rescan_nodes_info(addresses):
                 info = future.result()
                 results[address] = info
                 version_str = info.get("version", {}).get("version", "unknown")
-                logging.info("Updated info for {}: v{}".format(address, version_str))
+                logging.info("Updated info for {}: {}".format(address, version_str))
             except Exception as e:
                 logging.error("Error fetching info for {}: {}".format(address, e))
                 results[address] = {
