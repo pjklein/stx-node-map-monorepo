@@ -29,7 +29,7 @@ run:
 	@(cd backend && bash -c 'source env.sh && .venv/bin/python run.py api' >> logs/api.log 2>&1 &) || echo "API may already be running"
 	@sleep 2
 	@echo "Starting UI..."
-	@(cd frontend && HOST=0.0.0.0 npm start >> logs/npm.log 2>&1 &) || echo "UI may already be running"
+	@(cd frontend && HOST=0.0.0.0 npm run start:dev >> logs/npm.log 2>&1 &) || echo "UI may already be running"
 	@echo "✅ All services started (check ports 8089 and 3000)"
 	@echo "📝 Logs: backend/logs/discoverer.log, backend/logs/api.log, frontend/logs/npm.log"
 
