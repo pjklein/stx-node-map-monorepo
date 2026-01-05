@@ -335,12 +335,11 @@ def worker():
     os.makedirs(os.path.dirname(geoloc_log), exist_ok=True)
     
     for address in found:
-        neighbors = get_neighbors(address)
-        node_info = get_node_info(address)
-        
         # Check if this is a private IP address
         if is_private_ip(address):
-            # Skip geolocation for private IPs
+            # Skip geolocation and node info for private IPs
+            neighbors = get_neighbors(address)
+            node_info = {}  # Empty info for private IPs
             location = {
                 "lat": 0.0,
                 "lng": 0.0,
@@ -349,6 +348,10 @@ def worker():
             }
             logging.info("{} is a private IP address".format(address))
         else:
+            # Fetch info and geolocation for public IPs
+            neighbors = get_neighbors(address)
+            node_info = get_node_info(address)
+            
             # Check if we should fetch geolocation (only once per month)
             location = None
             if should_fetch_geolocation(known_nodes, address):
