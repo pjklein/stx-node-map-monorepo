@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import socket
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
@@ -52,6 +53,18 @@ def is_private_ip(ip: str) -> bool:
         return False
     except:
         return True  # Invalid IP, skip
+
+
+def check_port_open(host: str, port: int, timeout: float = 2.0) -> bool:
+    """Check if a TCP port is open on the host"""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        result = sock.connect_ex((host, port))
+        sock.close()
+        return result == 0
+    except:
+        return False
 
 
 def ip_to_location(ip: str):
@@ -124,10 +137,20 @@ def get_server_version(host: str):
 
 
 def get_node_info(host: str):
-    """Fetch /v2/info for a node and extract version details and burn_block_height"""
+    """Fetch /v2/info for a node and extract version details and burn_block_height
+    
+    Returns dict with:
+    - server_version, version, burn_block_height: node info (if API available)
+    - api_available: True if port 20443 responded
+    - p2p_available: True if port 20444 is open
+    """
     url = make_core_api_url(host, "info")
+    api_available = False
+    p2p_available = False
+    
     try:
         resp = requests.get(url, timeout=10).json()
+        api_available = True
         
         # Parse server_version string (e.g., "stacks-node 2.5.0.0.0 (master:abc123, release, linux [x86_64])")
         server_version = resp.get("server_version", "")
@@ -177,13 +200,20 @@ def get_node_info(host: str):
         return {
             "server_version": server_version,
             "version": version_info,
-            "burn_block_height": resp.get("burn_block_height")
+            "burn_block_height": resp.get("burn_block_height"),
+            "api_available": api_available,
+            "p2p_available": None  # Don't check P2P if API works
         }
     except BaseException:
+        # API failed, check if P2P port is open
+        p2p_available = check_port_open(host, 20444, timeout=3.0)
+        
         return {
             "server_version": None,
             "version": {"version": None, "commit_hash": None, "build_type": None, "platform": None},
-            "burn_block_height": None
+            "burn_block_height": None,
+            "api_available": api_available,
+            "p2p_available": p2p_available
         }
 
 
@@ -377,6 +407,19 @@ def worker():
         is_public = len(neighbors) > 0
         node_type = "public" if is_public else "private"
         
+        # Determine connection status
+        api_available = node_info.get("api_available", False)
+        p2p_available = node_info.get("p2p_available")
+        
+        if api_available:
+            connection_status = "api"
+        elif p2p_available:
+            connection_status = "p2p_only"
+            logging.info("{} - P2P port open, API unavailable".format(address))
+        else:
+            connection_status = "offline"
+            logging.info("{} - Both API and P2P ports unavailable".format(address))
+        
         # Build base item with info available to all nodes
         item = {
             "address": address,
@@ -384,7 +427,8 @@ def worker():
             "version": node_info.get("version"),
             "burn_block_height": node_info.get("burn_block_height"),
             "last_seen": datetime.utcnow().isoformat(),
-            "node_type": node_type
+            "node_type": node_type,
+            "connection_status": connection_status
         }
         
         # Add location if available (for both public and private nodes)
