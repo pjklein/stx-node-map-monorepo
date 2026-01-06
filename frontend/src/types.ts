@@ -15,6 +15,8 @@ export interface Node {
     };
     burn_block_height?: number;
     last_seen?: string;
+    node_type?: string;
+    connection_status?: "api" | "p2p_only" | "offline";
 }
 
 export interface ApiResponse {

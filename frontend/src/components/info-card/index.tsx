@@ -14,6 +14,11 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
     const totalNodes = nodes.length;
     const nodesWithLocation = nodes.filter(n => n.location && n.location.country !== "Unknown" && n.location.country !== "Private IP").length;
     const uniqueCountries = new Set(nodes.filter(n => n.location && n.location.country !== "Unknown" && n.location.country !== "Private IP").map(n => n.location?.country)).size;
+    
+    // Count nodes by connection status
+    const apiNodes = nodes.filter(n => n.connection_status === "api").length;
+    const p2pNodes = nodes.filter(n => n.connection_status === "p2p_only").length;
+    const offlineNodes = nodes.filter(n => n.connection_status === "offline").length;
 
     return <div className="row mb-4">
         <div className="col-md-3 mb-2">
@@ -52,11 +57,18 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
         <div className="col-md-3 mb-2">
             <div className="card h-100 shadow-sm">
                 <div className="card-body">
-                    <h6 className="card-title text-muted">Status</h6>
-                    <h2>
-                        <span className="badge bg-success">Online</span>
-                    </h2>
-                    <small className="text-muted">Last updated now</small>
+                    <h6 className="card-title text-muted">Connection Status</h6>
+                    <div className="mt-2">
+                        <small className="d-block text-muted mb-1">
+                            <span className="badge bg-success me-2">{loading ? '?' : apiNodes}</span> API
+                        </small>
+                        <small className="d-block text-muted mb-1">
+                            <span className="badge bg-warning me-2">{loading ? '?' : p2pNodes}</span> P2P Only
+                        </small>
+                        <small className="d-block text-muted">
+                            <span className="badge bg-danger me-2">{loading ? '?' : offlineNodes}</span> Offline
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>

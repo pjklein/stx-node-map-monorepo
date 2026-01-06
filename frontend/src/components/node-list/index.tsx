@@ -175,6 +175,19 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                         <tr key={i}>
                                             <td>
                                                 <code className="text-danger">{node.address}</code>
+                                                {node.connection_status && (
+                                                    <div>
+                                                        {node.connection_status === 'api' && (
+                                                            <span className="badge bg-success ms-2">API</span>
+                                                        )}
+                                                        {node.connection_status === 'p2p_only' && (
+                                                            <span className="badge bg-warning ms-2">P2P Only</span>
+                                                        )}
+                                                        {node.connection_status === 'offline' && (
+                                                            <span className="badge bg-danger ms-2">Offline</span>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </td>
                                             <td>{node.location?.country || '-'}</td>
                                             <td>{node.location?.city || '-'}</td>
