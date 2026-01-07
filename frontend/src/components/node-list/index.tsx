@@ -133,7 +133,6 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                     {loading ? (
                         <div className="text-center py-5">
                             <div className="spinner-border" role="status">
-                                <span className="visually-hidden">Loading...</span>
                             </div>
                         </div>
                     ) : sortedNodes.length === 0 ? (
