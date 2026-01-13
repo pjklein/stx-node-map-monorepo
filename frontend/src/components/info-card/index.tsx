@@ -58,16 +58,19 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
             <div className="card h-100 shadow-sm">
                 <div className="card-body">
                     <h6 className="card-title text-muted">Connection Status</h6>
-                    <div className="mt-2">
-                        <small className="d-block text-muted mb-1">
-                            <span className="badge bg-success me-2">{loading ? '?' : apiNodes}</span> API
-                        </small>
-                        <small className="d-block text-muted mb-1">
-                            <span className="badge bg-warning me-2">{loading ? '?' : p2pNodes}</span> P2P Only
-                        </small>
-                        <small className="d-block text-muted">
-                            <span className="badge bg-danger me-2">{loading ? '?' : offlineNodes}</span> Offline
-                        </small>
+                    <div className="mt-3">
+                        <div className="d-flex align-items-center mb-2">
+                            <span className="legend-color-box" style={{backgroundColor: '#28a745'}}></span>
+                            <small className="ms-3">API ({loading ? '?' : apiNodes})</small>
+                        </div>
+                        <div className="d-flex align-items-center mb-2">
+                            <span className="legend-color-box" style={{backgroundColor: '#ffc107'}}></span>
+                            <small className="ms-3">P2P Only ({loading ? '?' : p2pNodes})</small>
+                        </div>
+                        <div className="d-flex align-items-center mb-2">
+                            <span className="legend-color-box" style={{backgroundColor: '#dc3545'}}></span>
+                            <small className="ms-3">Offline ({loading ? '?' : offlineNodes})</small>
+                        </div>
                     </div>
                 </div>
             </div>
