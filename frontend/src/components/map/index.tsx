@@ -22,6 +22,7 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
     const mapRef = useRef<any>(null);
     const [zoom, setZoom] = useState(2);
     const [expandedLocation, setExpandedLocation] = useState<string | null>(null);
+    const popupRefs = useRef<{[key: string]: any}>({});
     const publicCount = nodes.filter(x => x.location && x.location.country !== "Unknown" && x.location.country !== "Private IP").length;
 
     // Group nodes by location
@@ -161,13 +162,22 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                 return group.nodes.map((node, nodeIdx) => {
                                     const position = getBreakoutPosition(group.lat, group.lng, nodeIdx, group.nodes.length);
                                     const markerIcon = getMarkerIcon(node.connection_status, 1);
+                                    const popupKey = `${groupIdx}-${nodeIdx}`;
                                     
                                     return <Marker 
                                         icon={markerIcon} 
-                                        key={`${groupIdx}-${nodeIdx}`} 
+                                        key={popupKey}
                                         position={position}
+                                        onClick={() => {
+                                            if (popupRefs.current[popupKey]) {
+                                                popupRefs.current[popupKey].leafletElement.openPopup();
+                                            }
+                                        }}
                                     >
-                                        <Popup className="map-popup-content">
+                                        <Popup 
+                                            ref={(el) => { if (el) popupRefs.current[popupKey] = el; }}
+                                            className="map-popup-content"
+                                        >
                                             <div className="map-popup">
                                                 <strong>{node.location?.country}</strong>
                                                 {node.location?.city && <p className="mb-1">{node.location.city}</p>}
@@ -193,6 +203,7 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                             } else {
                                 // Show single marker with count badge
                                 const markerIcon = getMarkerIcon(group.bestStatus, group.nodes.length);
+                                const popupKey = `group-${groupIdx}`;
                                 
                                 return <Marker 
                                     icon={markerIcon} 
@@ -200,12 +211,13 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                     position={{ lat: group.lat, lng: group.lng }}
                                     onClick={() => {
                                         setExpandedLocation(locationKey);
-                                        if (mapRef.current && group.nodes.length > 1) {
-                                            mapRef.current.leafletElement.setView([group.lat, group.lng], Math.max(zoom, 10));
+                                        if (popupRefs.current[popupKey]) {
+                                            popupRefs.current[popupKey].leafletElement.openPopup();
                                         }
                                     }}
                                 >
                                     <Popup 
+                                        ref={(el) => { if (el) popupRefs.current[popupKey] = el; }}
                                         className="map-popup-content"
                                         onClose={() => setExpandedLocation(null)}
                                     >
