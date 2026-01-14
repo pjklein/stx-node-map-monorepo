@@ -143,14 +143,20 @@ def get_node_info(host: str):
     - server_version, version, burn_block_height: node info (if API available)
     - api_available: True if port 20443 responded
     - p2p_available: True if port 20444 is open
+    - stacker_db_count: Number of Stacker DBs (from stackerdbs property)
     """
     url = make_core_api_url(host, "info")
     api_available = False
     p2p_available = False
+    stacker_db_count = 0
     
     try:
         resp = requests.get(url, timeout=10).json()
         api_available = True
+        
+        # Extract Stacker DB count from response
+        if "stackerdbs" in resp:
+            stacker_db_count = len(resp.get("stackerdbs", []))
         
         # Parse server_version string (e.g., "stacks-node 2.5.0.0.0 (master:abc123, release, linux [x86_64])")
         server_version = resp.get("server_version", "")
@@ -202,7 +208,8 @@ def get_node_info(host: str):
             "version": version_info,
             "burn_block_height": resp.get("burn_block_height"),
             "api_available": api_available,
-            "p2p_available": None  # Don't check P2P if API works
+            "p2p_available": None,  # Don't check P2P if API works
+            "stacker_db_count": stacker_db_count
         }
     except BaseException:
         # API failed, check if P2P port is open
@@ -213,29 +220,9 @@ def get_node_info(host: str):
             "version": {"version": None, "commit_hash": None, "build_type": None, "platform": None},
             "burn_block_height": None,
             "api_available": api_available,
-            "p2p_available": p2p_available
+            "p2p_available": p2p_available,
+            "stacker_db_count": 0
         }
-
-
-def get_stacker_db_count(host: str) -> int:
-    """Fetch count of Stacker DBs from a node
-    
-    Returns: Number of Stacker DBs, or 0 if unable to fetch
-    """
-    try:
-        url = make_core_api_url(host, "stacker_db")
-        resp = requests.get(url, timeout=10).json()
-        
-        # The response typically has a list or dict with multiple stacker DBs
-        if isinstance(resp, list):
-            return len(resp)
-        elif isinstance(resp, dict) and "stacker_dbs" in resp:
-            return len(resp["stacker_dbs"])
-        else:
-            # Try to count keys if it's a dict
-            return len(resp)
-    except BaseException:
-        return 0
 
 
 def get_neighbors(host: str):
