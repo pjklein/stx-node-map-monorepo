@@ -217,6 +217,27 @@ def get_node_info(host: str):
         }
 
 
+def get_stacker_db_count(host: str) -> int:
+    """Fetch count of Stacker DBs from a node
+    
+    Returns: Number of Stacker DBs, or 0 if unable to fetch
+    """
+    try:
+        url = make_core_api_url(host, "stacker_db")
+        resp = requests.get(url, timeout=10).json()
+        
+        # The response typically has a list or dict with multiple stacker DBs
+        if isinstance(resp, list):
+            return len(resp)
+        elif isinstance(resp, dict) and "stacker_dbs" in resp:
+            return len(resp["stacker_dbs"])
+        else:
+            # Try to count keys if it's a dict
+            return len(resp)
+    except BaseException:
+        return 0
+
+
 def get_neighbors(host: str):
     url = make_core_api_url(host, "neighbors")
     try:
@@ -420,6 +441,12 @@ def worker():
             connection_status = "offline"
             logging.info("{} - Both API and P2P ports unavailable".format(address))
         
+        # Fetch Stacker DB count only for API nodes
+        stacker_db_count = 0
+        if connection_status == "api":
+            stacker_db_count = get_stacker_db_count(address)
+            logging.info("{} - Found {} Stacker DBs".format(address, stacker_db_count))
+        
         # Build base item with info available to all nodes
         item = {
             "address": address,
@@ -428,7 +455,8 @@ def worker():
             "burn_block_height": node_info.get("burn_block_height"),
             "last_seen": datetime.utcnow().isoformat(),
             "node_type": node_type,
-            "connection_status": connection_status
+            "connection_status": connection_status,
+            "stacker_db_count": stacker_db_count
         }
         
         # Add location if available (for both public and private nodes)
