@@ -17,6 +17,7 @@ export interface Node {
     last_seen?: string;
     node_type?: string;
     connection_status?: "api" | "p2p_only" | "offline";
+    stacker_db_count?: number;
 }
 
 export interface ApiResponse {

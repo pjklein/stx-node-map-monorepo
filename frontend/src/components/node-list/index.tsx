@@ -166,6 +166,7 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                         <th style={{cursor: 'pointer'}} onClick={() => handleSort('burn_block_height')}>
                                             Burn Height{getSortIndicator('burn_block_height')}
                                         </th>
+                                        <th>Stacker DBs</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -195,6 +196,13 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                             <td><small>{node.version?.build_type || '-'}</small></td>
                                             <td><small className="text-muted">{node.version?.platform || '-'}</small></td>
                                             <td>{node.burn_block_height ? node.burn_block_height.toLocaleString() : '-'}</td>
+                                            <td>
+                                                {node.connection_status === 'api' && node.stacker_db_count !== undefined ? (
+                                                    <span className="badge bg-info">{node.stacker_db_count}</span>
+                                                ) : (
+                                                    <span className="text-muted">-</span>
+                                                )}
+                                            </td>
                                             <td>
                                                 <a
                                                     href={`http://${node.address}:20443/v2/info`}
