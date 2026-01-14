@@ -183,9 +183,13 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                                 {node.location?.city && <p className="mb-1">{node.location.city}</p>}
                                                 <hr className="my-2" />
                                                 <div className="mb-2 d-flex align-items-center justify-content-between">
-                                                    <a href={`http://${node.address}:20443/v2/info`} rel="noreferrer" target="_blank" className="text-decoration-none">
-                                                        {node.address}
-                                                    </a>
+                                                    {node.connection_status === 'api' ? (
+                                                        <a href={`http://${node.address}:20443/v2/info`} rel="noreferrer" target="_blank" className="text-decoration-none">
+                                                            {node.address}
+                                                        </a>
+                                                    ) : (
+                                                        <span>{node.address}</span>
+                                                    )}
                                                     <span className={`badge bg-${
                                                         node.connection_status === 'api' ? 'success' : 
                                                         node.connection_status === 'p2p_only' ? 'warning' : 
@@ -237,9 +241,13 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                                                   connection_status === 'offline' ? 'Offline' : 'Unknown';
 
                                                 return <div key={idx} className="mb-2 d-flex align-items-center justify-content-between">
-                                                    <a href={href} rel="noreferrer" target="_blank" className="text-decoration-none">
-                                                        {address}
-                                                    </a>
+                                                    {connection_status === 'api' ? (
+                                                        <a href={href} rel="noreferrer" target="_blank" className="text-decoration-none">
+                                                            {address}
+                                                        </a>
+                                                    ) : (
+                                                        <span>{address}</span>
+                                                    )}
                                                     <span className={`badge bg-${statusBadge} ms-2`}>{statusLabel}</span>
                                                 </div>
                                             })}

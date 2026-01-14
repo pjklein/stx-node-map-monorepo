@@ -9,7 +9,7 @@ interface Props {
     loading?: boolean;
 }
 
-type SortField = 'address' | 'country' | 'city' | 'version' | 'commit_hash' | 'build_type' | 'platform' | 'burn_block_height';
+type SortField = 'address' | 'country' | 'city' | 'version' | 'commit_hash' | 'build_type' | 'platform' | 'burn_block_height' | 'stacker_db_count';
 type SortOrder = 'asc' | 'desc';
 
 const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading = false }) => {
@@ -74,6 +74,10 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                 case 'burn_block_height':
                     aVal = a.burn_block_height || 0;
                     bVal = b.burn_block_height || 0;
+                    break;
+                case 'stacker_db_count':
+                    aVal = a.stacker_db_count || 0;
+                    bVal = b.stacker_db_count || 0;
                     break;
                 default:
                     return 0;
@@ -166,7 +170,9 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                         <th style={{cursor: 'pointer'}} onClick={() => handleSort('burn_block_height')}>
                                             Burn Height{getSortIndicator('burn_block_height')}
                                         </th>
-                                        <th>Stacker DBs</th>
+                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('stacker_db_count')}>
+                                            Stacker DBs{getSortIndicator('stacker_db_count')}
+                                        </th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -204,14 +210,18 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                                 )}
                                             </td>
                                             <td>
-                                                <a
-                                                    href={`http://${node.address}:20443/v2/info`}
-                                                    rel="noreferrer"
-                                                    target="_blank"
-                                                    className="btn btn-sm btn-outline-primary"
-                                                >
-                                                    View
-                                                </a>
+                                                {node.connection_status === 'api' ? (
+                                                    <a
+                                                        href={`http://${node.address}:20443/v2/info`}
+                                                        rel="noreferrer"
+                                                        target="_blank"
+                                                        className="btn btn-sm btn-outline-primary"
+                                                    >
+                                                        View
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-muted">-</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
