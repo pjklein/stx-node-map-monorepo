@@ -428,10 +428,9 @@ def worker():
             connection_status = "offline"
             logging.info("{} - Both API and P2P ports unavailable".format(address))
         
-        # Fetch Stacker DB count only for API nodes
-        stacker_db_count = 0
-        if connection_status == "api":
-            stacker_db_count = get_stacker_db_count(address)
+        # Get Stacker DB count from node_info (only available for API nodes)
+        stacker_db_count = node_info.get("stacker_db_count", 0)
+        if connection_status == "api" and stacker_db_count > 0:
             logging.info("{} - Found {} Stacker DBs".format(address, stacker_db_count))
         
         # Build base item with info available to all nodes
@@ -492,6 +491,14 @@ def worker():
             logging.info("{} is a public node but geolocation failed".format(address))
 
         result.append(item)
+
+    # Preserve any previously known nodes that weren't in this scan
+    # (they may have gone offline temporarily or weren't discovered this run)
+    result_by_address = {node["address"]: node for node in result}
+    for address, known_node in known_nodes.items():
+        if address not in result_by_address:
+            result.append(known_node)
+            logging.info("Preserving previously known node {}".format(address))
 
     save_path = os.path.join(this_dir, "..", "..", "..", "data.json")
     file_write(save_path, json.dumps(result))

@@ -24,7 +24,8 @@ def __flask_setup():
     def nodes():
         try:
             data = json.loads(file_read(file_path))
-        except FileNotFoundError:
+        except (FileNotFoundError, json.JSONDecodeError, ValueError):
+            # File doesn't exist, is empty, or contains invalid JSON
             data = []
 
         resp = {
