@@ -172,14 +172,12 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                         <Popup 
                                             ref={(el) => { if (el) popupRefs.current[popupKey] = el; }}
                                             className="map-popup-content"
-                                            autoPan={true}
-                                            autoPanPadding={[50, 50]}
-                                            keepInView={true}
                                             maxHeight={400}
                                         >
                                             <div className="map-popup">
-                                                <strong>{node.location?.country}</strong>
-                                                {node.location?.city && <p className="mb-1">{node.location.city}</p>}
+                                                <strong>
+                                                    {node.location?.city ? `${node.location.city}, ${node.location.country}` : node.location?.country}
+                                                </strong>
                                                 <hr className="my-2" />
                                                 <div className="mb-2 d-flex align-items-center justify-content-between">
                                                     {node.connection_status === 'api' ? (
@@ -217,14 +215,13 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                         ref={(el) => { if (el) popupRefs.current[popupKey] = el; }}
                                         className="map-popup-content"
                                         onClose={() => setExpandedLocation(null)}
-                                        autoPan={true}
-                                        autoPanPadding={[50, 50]}
-                                        keepInView={true}
                                         maxHeight={400}
                                     >
                                         <div className="map-popup">
-                                            <strong>{group.nodes[0].location?.country}</strong>
-                                            {group.nodes[0].location?.city && <p className="mb-1">{group.nodes[0].location.city}</p>}
+                                            <strong>
+                                                {group.nodes[0].location?.city ? `${group.nodes[0].location.city}, ${group.nodes[0].location.country}` : group.nodes[0].location?.country}
+                                            </strong>
+                                            <br />
                                             <small className="text-muted">{group.nodes.length} node{group.nodes.length > 1 ? 's' : ''}</small>
                                             <hr className="my-2" />
                                             {group.nodes.map((x, idx) => {
