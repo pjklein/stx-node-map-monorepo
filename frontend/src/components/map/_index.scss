@@ -1,0 +1,82 @@
+.node-map {
+  width: 300px;
+  margin: 0 auto 30px auto;
+
+  @media (min-width: $sm-break) {
+    width: 500px;
+  }
+
+  @media (min-width: $md-break) {
+    width: 700px;
+  }
+
+  @media (min-width: $lg-break) {
+    width: 900px;
+  }
+
+  @media (min-width: $xl-break) {
+    width: 1100px;
+  }
+
+  .title {
+    padding: 10px 0;
+    text-align: center;
+    color: $gray-600;
+  }
+
+  .the-map {
+    // Calculate height: 100vh - (navbar ~60px + buttons ~70px + info cards ~280px + footer 60px + margins ~80px)
+    // Total overhead ~550px, leaving space for map
+    height: calc(100vh - 550px) !important;
+    min-height: 400px !important;
+    max-height: 600px !important;
+
+    border: 3px solid $gray-100;
+    border-radius: 4px;
+  }
+
+  .map-marker-icon {
+    background: none;
+    border: none;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .marker-svg {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      cursor: pointer;
+    }
+  }
+
+  .map-legend {
+    font-size: 0.85rem;
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .map-popup-content {
+    p {
+      margin-bottom: 4px;
+    }
+
+    .leaflet-popup-content {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  }
+}

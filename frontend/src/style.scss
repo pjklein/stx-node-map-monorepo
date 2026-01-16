@@ -1,0 +1,32 @@
+$font-family-base:  'Inter', sans-serif;
+
+@import "~bootstrap/scss/bootstrap";
+@import "~leaflet/dist/leaflet.css";
+@import "~react-leaflet-fullscreen/dist/styles.css";
+
+$sm-break: map-get($grid-breakpoints, "sm");
+$md-break: map-get($grid-breakpoints, "md");
+$lg-break: map-get($grid-breakpoints, "lg");
+$xl-break: map-get($grid-breakpoints, "xl");
+
+body {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.App {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+@import "components/navbar";
+@import "components/info-card";
+@import "components/map";
+@import "components/footer";
