@@ -77,9 +77,11 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                     bVal = b.burn_block_height || 0;
                     break;
                 case 'stacker_db_count':
-                    // undefined/null (shown as "-") sorts as -1 so it appears first
-                    aVal = a.stacker_db_count !== undefined && a.stacker_db_count !== null ? a.stacker_db_count : -1;
-                    bVal = b.stacker_db_count !== undefined && b.stacker_db_count !== null ? b.stacker_db_count : -1;
+                    // Non-API nodes (shown as "-") sort as -1
+                    // API nodes with 0 sort as 0
+                    // API nodes with positive numbers sort normally
+                    aVal = a.connection_status === 'api' ? (a.stacker_db_count || 0) : -1;
+                    bVal = b.connection_status === 'api' ? (b.stacker_db_count || 0) : -1;
                     break;
                 default:
                     return 0;
