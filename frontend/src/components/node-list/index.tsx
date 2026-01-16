@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import {Node} from "../../types";
+import './_index.scss';
 
 interface Props {
     nodes: Node[];
@@ -76,8 +77,9 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                     bVal = b.burn_block_height || 0;
                     break;
                 case 'stacker_db_count':
-                    aVal = a.stacker_db_count || 0;
-                    bVal = b.stacker_db_count || 0;
+                    // undefined/null (shown as "-") sorts as -1 so it appears first
+                    aVal = a.stacker_db_count !== undefined && a.stacker_db_count !== null ? a.stacker_db_count : -1;
+                    bVal = b.stacker_db_count !== undefined && b.stacker_db_count !== null ? b.stacker_db_count : -1;
                     break;
                 default:
                     return 0;
@@ -103,14 +105,14 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
 
     const sortedNodes = getSortedAndFilteredNodes();
 
-    return <div className="row">
+    return <div className="row node-list-wrapper">
         <div className="col-md-12">
             <div className="card shadow-sm">
                 <div className="card-header bg-primary text-white">
                     <h5 className="mb-0">📋 Node List ({sortedNodes.length} / {nodes.length} nodes)</h5>
                 </div>
                 <div className="card-body">
-                    <div className="row mb-3">
+                    <div className="row mb-3 filters-row">
                         <div className="col-md-8">
                             <input
                                 type="text"

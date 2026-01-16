@@ -1,6 +1,6 @@
 .node-map {
   width: 300px;
-  margin: 0 auto 60px auto;
+  margin: 0 auto 30px auto;
 
   @media (min-width: $sm-break) {
     width: 500px;
@@ -25,15 +25,11 @@
   }
 
   .the-map {
-    height: 350px;
-
-    @media (min-width: $lg-break) {
-      height: 450px;
-    }
-
-    @media (min-width: $xl-break) {
-      height: 550px;
-    }
+    // Calculate height: 100vh - (navbar ~60px + buttons ~70px + info cards ~280px + footer 60px + margins ~80px)
+    // Total overhead ~550px, leaving space for map
+    height: calc(100vh - 550px) !important;
+    min-height: 400px !important;
+    max-height: 600px !important;
 
     border: 3px solid $gray-100;
     border-radius: 4px;
@@ -76,6 +72,11 @@
   .map-popup-content {
     p {
       margin-bottom: 4px;
+    }
+
+    .leaflet-popup-content {
+      max-height: 400px;
+      overflow-y: auto;
     }
   }
 }

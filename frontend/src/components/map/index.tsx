@@ -126,7 +126,7 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
 
     return <div className="row">
         <div className="col-md-12">
-            <div className="card shadow-sm">
+            <div className="card shadow-sm node-map">
                 <div className="card-header bg-primary text-white">
                     <h5 className="mb-0">📍 Node Distribution Map ({publicCount} geo-located nodes)</h5>
                 </div>
@@ -141,7 +141,7 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                         scrollWheelZoom={true}
                         doubleClickZoom={true}
                         className="the-map" 
-                        style={{ height: '500px', width: '100%' }}
+                        style={{ height: '100%', width: '100%' }}
                         onZoomEnd={() => {
                             if (mapRef.current) {
                                 setZoom(mapRef.current.leafletElement.getZoom());
@@ -168,15 +168,14 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                         icon={markerIcon} 
                                         key={popupKey}
                                         position={position}
-                                        onClick={() => {
-                                            if (popupRefs.current[popupKey]) {
-                                                popupRefs.current[popupKey].leafletElement.openPopup();
-                                            }
-                                        }}
                                     >
                                         <Popup 
                                             ref={(el) => { if (el) popupRefs.current[popupKey] = el; }}
                                             className="map-popup-content"
+                                            autoPan={true}
+                                            autoPanPadding={[50, 50]}
+                                            keepInView={true}
+                                            maxHeight={400}
                                         >
                                             <div className="map-popup">
                                                 <strong>{node.location?.country}</strong>
@@ -213,17 +212,15 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
                                     icon={markerIcon} 
                                     key={groupIdx} 
                                     position={{ lat: group.lat, lng: group.lng }}
-                                    onClick={() => {
-                                        setExpandedLocation(locationKey);
-                                        if (popupRefs.current[popupKey]) {
-                                            popupRefs.current[popupKey].leafletElement.openPopup();
-                                        }
-                                    }}
                                 >
                                     <Popup 
                                         ref={(el) => { if (el) popupRefs.current[popupKey] = el; }}
                                         className="map-popup-content"
                                         onClose={() => setExpandedLocation(null)}
+                                        autoPan={true}
+                                        autoPanPadding={[50, 50]}
+                                        keepInView={true}
+                                        maxHeight={400}
                                     >
                                         <div className="map-popup">
                                             <strong>{group.nodes[0].location?.country}</strong>
