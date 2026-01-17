@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import './App.css';
 
 import NavBar from "./components/navbar";
@@ -53,7 +53,7 @@ function App() {
         setFilteredNodes(filtered);
     }, [searchTerm, nodes]);
 
-    return <Router>
+    return (
         <div className="App">
             <NavBar network={network} />
             {error && <div className="alert alert-danger m-3">{error}</div>}
@@ -94,7 +94,7 @@ function App() {
             </div>
             <Footer />
         </div>
-    </Router>
+    );
 }
 
 export default App;
