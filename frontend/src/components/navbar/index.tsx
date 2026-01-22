@@ -75,7 +75,7 @@ const NavBar: React.FC<NavBarProps> = ({ network, theme, toggleTheme }) => {
                 <hr />
             </div>
             
-            <Nav className="me-auto">
+            <Nav className="ms-auto">
                 <NavLink 
                     to="/map" 
                     className={({ isActive }: { isActive: boolean }) => isActive ? "nav-link active-view" : "nav-link"}
@@ -90,9 +90,7 @@ const NavBar: React.FC<NavBarProps> = ({ network, theme, toggleTheme }) => {
                     <span className="d-none d-sm-inline">📋 List View</span>
                     <span className="d-inline d-sm-none">📋 List</span>
                 </NavLink>
-            </Nav>
-            
-            <Nav className="ms-auto">
+                
                 <Nav.Link href="https://stacks.org" target="_blank">
                   Stacks {openInNewSvg}
                 </Nav.Link>
