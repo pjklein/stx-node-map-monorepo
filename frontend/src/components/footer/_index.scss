@@ -5,23 +5,42 @@
     right: 0;
     background: #2c3e50;
     color: #ecf0f1;
-    padding: 8px 16px;
+    padding: 6px 12px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     border-top: 1px solid #34495e;
     z-index: 100;
+    
+    @media (min-width: $md-break) {
+        padding: 8px 16px;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: 0.85rem;
+    }
 
     .status-indicator {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
+        margin-bottom: 4px;
+        
+        @media (min-width: $md-break) {
+            gap: 8px;
+            margin-bottom: 0;
+        }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
+            
+            @media (min-width: $md-break) {
+                width: 8px;
+                height: 8px;
+            }
             
             &.scanning {
                 background: #3498db;
@@ -40,7 +59,13 @@
 
     .status-info {
         display: flex;
-        gap: 16px;
+        gap: 8px;
+        font-size: 0.65rem;
+        
+        @media (min-width: $md-break) {
+            gap: 16px;
+            font-size: 0.85rem;
+        }
         
         .nodes-count {
             font-weight: 600;
@@ -49,6 +74,11 @@
         
         .last-scan {
             color: #95a5a6;
+            display: none;
+            
+            @media (min-width: $sm-break) {
+                display: inline;
+            }
         }
     }
 }

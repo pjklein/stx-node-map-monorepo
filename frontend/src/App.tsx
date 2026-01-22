@@ -56,22 +56,24 @@ function App() {
     return (
         <div className="App">
             <NavBar network={network} />
-            {error && <div className="alert alert-danger m-3">{error}</div>}
-            <div className="container-fluid py-3">
-                <div className="row mb-3">
-                    <div className="col-md-12">
-                        <div className="btn-group w-100" role="group">
+            {error && <div className="alert alert-danger m-2 m-md-3">{error}</div>}
+            <div className="container-fluid py-2 py-md-3 px-2 px-md-3">
+                <div className="row mb-2 mb-md-3">
+                    <div className="col-12">
+                        <div className="btn-group w-100 d-flex" role="group">
                             <NavLink 
                                 to="/map" 
-                                className={({ isActive }: { isActive: boolean }) => isActive ? "btn btn-primary" : "btn btn-outline-primary"}
+                                className={({ isActive }: { isActive: boolean }) => isActive ? "btn btn-primary flex-fill" : "btn btn-outline-primary flex-fill"}
                             >
-                                Map View
+                                <span className="d-none d-sm-inline">Map View</span>
+                                <span className="d-inline d-sm-none">🗺️ Map</span>
                             </NavLink>
                             <NavLink 
                                 to="/list" 
-                                className={({ isActive }: { isActive: boolean }) => isActive ? "btn btn-primary" : "btn btn-outline-primary"}
+                                className={({ isActive }: { isActive: boolean }) => isActive ? "btn btn-primary flex-fill" : "btn btn-outline-primary flex-fill"}
                             >
-                                List View
+                                <span className="d-none d-sm-inline">List View</span>
+                                <span className="d-inline d-sm-none">📋 List</span>
                             </NavLink>
                         </div>
                     </div>

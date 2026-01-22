@@ -115,18 +115,18 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                 </div>
                 <div className="card-body">
                     <div className="row mb-3 filters-row">
-                        <div className="col-md-8">
+                        <div className="col-12 col-md-8 mb-2 mb-md-0">
                             <input
                                 type="text"
-                                className="form-control form-control-lg"
+                                className="form-control"
                                 placeholder="Search by IP address, city, or country..."
                                 value={searchTerm}
                                 onChange={(e) => onSearchChange(e.target.value)}
                             />
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-12 col-md-4">
                             <select
-                                className="form-control form-control-lg"
+                                className="form-control"
                                 value={versionFilterMajor}
                                 onChange={(e) => setVersionFilterMajor(e.target.value)}
                             >
@@ -153,28 +153,28 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                         <th style={{cursor: 'pointer'}} onClick={() => handleSort('address')}>
                                             IP Address{getSortIndicator('address')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('country')}>
+                                        <th className="hide-mobile" style={{cursor: 'pointer'}} onClick={() => handleSort('country')}>
                                             Country{getSortIndicator('country')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('city')}>
+                                        <th className="hide-mobile" style={{cursor: 'pointer'}} onClick={() => handleSort('city')}>
                                             City{getSortIndicator('city')}
                                         </th>
                                         <th style={{cursor: 'pointer'}} onClick={() => handleSort('version')}>
                                             Version{getSortIndicator('version')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('commit_hash')}>
+                                        <th className="hide-mobile" style={{cursor: 'pointer'}} onClick={() => handleSort('commit_hash')}>
                                             Commit{getSortIndicator('commit_hash')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('build_type')}>
+                                        <th className="hide-mobile" style={{cursor: 'pointer'}} onClick={() => handleSort('build_type')}>
                                             Build Type{getSortIndicator('build_type')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('platform')}>
+                                        <th className="hide-mobile" style={{cursor: 'pointer'}} onClick={() => handleSort('platform')}>
                                             Platform{getSortIndicator('platform')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('burn_block_height')}>
+                                        <th className="hide-mobile" style={{cursor: 'pointer'}} onClick={() => handleSort('burn_block_height')}>
                                             Burn Height{getSortIndicator('burn_block_height')}
                                         </th>
-                                        <th style={{cursor: 'pointer'}} onClick={() => handleSort('stacker_db_count')}>
+                                        <th className="hide-mobile" style={{cursor: 'pointer'}} onClick={() => handleSort('stacker_db_count')}>
                                             Stacker DBs{getSortIndicator('stacker_db_count')}
                                         </th>
                                         <th>Action</th>
@@ -199,14 +199,14 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
                                                     </div>
                                                 )}
                                             </td>
-                                            <td>{node.location?.country || '-'}</td>
-                                            <td>{node.location?.city || '-'}</td>
+                                            <td className="hide-mobile">{node.location?.country || '-'}</td>
+                                            <td className="hide-mobile">{node.location?.city || '-'}</td>
                                             <td><code>{node.version?.version || '-'}</code></td>
-                                            <td><code className="text-muted">{node.version?.commit_hash || '-'}</code></td>
-                                            <td><small>{node.version?.build_type || '-'}</small></td>
-                                            <td><small className="text-muted">{node.version?.platform || '-'}</small></td>
-                                            <td>{node.burn_block_height ? node.burn_block_height.toLocaleString() : '-'}</td>
-                                            <td>
+                                            <td className="hide-mobile"><code className="text-muted">{node.version?.commit_hash || '-'}</code></td>
+                                            <td className="hide-mobile"><small>{node.version?.build_type || '-'}</small></td>
+                                            <td className="hide-mobile"><small className="text-muted">{node.version?.platform || '-'}</small></td>
+                                            <td className="hide-mobile">{node.burn_block_height ? node.burn_block_height.toLocaleString() : '-'}</td>
+                                            <td className="hide-mobile">
                                                 {node.connection_status === 'api' && node.stacker_db_count !== undefined ? (
                                                     <span className="badge bg-info">{node.stacker_db_count}</span>
                                                 ) : (

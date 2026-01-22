@@ -3,7 +3,13 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-bottom: 60px; /* Space for fixed footer */
+  padding-bottom: 50px; /* Smaller footer on mobile */
+}
+
+@media (min-width: 768px) {
+  .App {
+    padding-bottom: 60px; /* Larger footer on desktop */
+  }
 }
 
 .container-fluid {
@@ -11,6 +17,38 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Ensure buttons and interactive elements are touch-friendly */
+.btn {
+  min-height: 44px; /* iOS minimum touch target */
+  padding: 0.5rem 0.75rem;
+}
+
+@media (max-width: 576px) {
+  .btn {
+    font-size: 0.875rem;
+  }
+}
+
+/* Make cards more compact on mobile */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 0.75rem;
+  }
+  
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h5 {
+    font-size: 1rem;
+  }
 }
 
 .App-logo {

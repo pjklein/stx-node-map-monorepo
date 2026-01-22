@@ -1,9 +1,12 @@
 .node-map {
-  width: 300px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto 30px auto;
+  padding: 0 10px;
 
   @media (min-width: $sm-break) {
     width: 500px;
+    padding: 0;
   }
 
   @media (min-width: $md-break) {
@@ -22,17 +25,29 @@
     padding: 10px 0;
     text-align: center;
     color: $gray-600;
+    font-size: 0.9rem;
+
+    @media (min-width: $md-break) {
+      font-size: 1rem;
+    }
   }
 
   .the-map {
-    // Calculate height: 100vh - (navbar ~60px + buttons ~70px + info cards ~280px + footer 60px + margins ~80px)
-    // Total overhead ~550px, leaving space for map
-    height: calc(100vh - 550px) !important;
-    min-height: 400px !important;
-    max-height: 600px !important;
+    // Mobile-first: smaller height for mobile devices
+    height: 400px !important;
+    min-height: 300px !important;
+    max-height: 500px !important;
 
-    border: 3px solid $gray-100;
+    border: 2px solid $gray-100;
     border-radius: 4px;
+
+    // Larger screens get more height
+    @media (min-width: $md-break) {
+      height: calc(100vh - 550px) !important;
+      min-height: 400px !important;
+      max-height: 600px !important;
+      border: 3px solid $gray-100;
+    }
   }
 
   .map-marker-icon {
@@ -51,32 +66,56 @@
   }
 
   .map-legend {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    
+    @media (min-width: $md-break) {
+      font-size: 0.85rem;
+    }
     
     .legend-item {
       display: flex;
       align-items: center;
       gap: 5px;
       white-space: nowrap;
+      margin-bottom: 4px;
+      
+      @media (max-width: $sm-break) {
+        font-size: 0.7rem;
+      }
     }
 
     .legend-dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       display: inline-block;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+      
+      @media (min-width: $md-break) {
+        width: 10px;
+        height: 10px;
+      }
     }
   }
 
   .map-popup-content {
     p {
       margin-bottom: 4px;
+      font-size: 0.85rem;
+      
+      @media (max-width: $sm-break) {
+        font-size: 0.8rem;
+      }
     }
 
     .leaflet-popup-content {
-      max-height: 400px;
+      max-height: 300px;
       overflow-y: auto;
+      
+      @media (min-width: $md-break) {
+        max-height: 400px;
+      }
     }
   }
 }

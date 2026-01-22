@@ -1,12 +1,25 @@
 .node-list-wrapper {
   .card {
-    max-height: calc(100vh - 400px);
+    max-height: calc(100vh - 300px);
     display: flex;
     flex-direction: column;
+    
+    @media (min-width: $md-break) {
+      max-height: calc(100vh - 400px);
+    }
   }
 
   .card-header {
     flex-shrink: 0;
+    padding: 0.75rem 1rem;
+    
+    h5 {
+      font-size: 1rem;
+      
+      @media (min-width: $md-break) {
+        font-size: 1.25rem;
+      }
+    }
   }
 
   .card-body {
@@ -14,15 +27,58 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding: 0.75rem;
+    
+    @media (min-width: $md-break) {
+      padding: 1.25rem;
+    }
   }
 
   .filters-row {
     flex-shrink: 0;
+    margin-bottom: 1rem;
+    
+    .col-md-8, .col-md-4 {
+      margin-bottom: 0.5rem;
+      
+      @media (min-width: $md-break) {
+        margin-bottom: 0;
+      }
+    }
   }
 
   .table-responsive {
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 500px);
+    overflow-x: auto;
+    max-height: calc(100vh - 400px);
+    
+    @media (min-width: $md-break) {
+      max-height: calc(100vh - 500px);
+    }
+    
+    table {
+      font-size: 0.75rem;
+      
+      @media (min-width: $md-break) {
+        font-size: 0.875rem;
+      }
+      
+      th, td {
+        padding: 0.5rem 0.25rem;
+        white-space: nowrap;
+        
+        @media (min-width: $md-break) {
+          padding: 0.75rem 0.5rem;
+        }
+      }
+      
+      // Hide less critical columns on mobile
+      @media (max-width: $md-break) {
+        .hide-mobile {
+          display: none;
+        }
+      }
+    }
   }
 }

@@ -21,7 +21,7 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
     const offlineNodes = nodes.filter(n => n.connection_status === "offline").length;
 
     return <div className="row mb-4">
-        <div className="col-md-3 mb-2">
+        <div className="col-12 col-sm-6 col-md-3 mb-3 mb-md-2">
             <div className="card h-100 shadow-sm">
                 <div className="card-body">
                     <h6 className="card-title text-muted">Total Nodes</h6>
@@ -32,7 +32,7 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
                 </div>
             </div>
         </div>
-        <div className="col-md-3 mb-2">
+        <div className="col-12 col-sm-6 col-md-3 mb-3 mb-md-2">
             <div className="card h-100 shadow-sm">
                 <div className="card-body">
                     <h6 className="card-title text-muted">Geo-Located</h6>
@@ -43,7 +43,7 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
                 </div>
             </div>
         </div>
-        <div className="col-md-3 mb-2">
+        <div className="col-12 col-sm-6 col-md-3 mb-3 mb-md-2">
             <div className="card h-100 shadow-sm">
                 <div className="card-body">
                     <h6 className="card-title text-muted">Countries</h6>
@@ -54,7 +54,7 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
                 </div>
             </div>
         </div>
-        <div className="col-md-3 mb-2">
+        <div className="col-12 col-sm-6 col-md-3 mb-3 mb-md-2">
             <div className="card h-100 shadow-sm">
                 <div className="card-body">
                     <h6 className="card-title text-muted">Connection Status</h6>
