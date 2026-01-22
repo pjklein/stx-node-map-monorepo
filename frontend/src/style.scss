@@ -4,10 +4,11 @@ $font-family-base:  'Inter', sans-serif;
 @import "~leaflet/dist/leaflet.css";
 @import "~react-leaflet-fullscreen/dist/styles.css";
 
-$sm-break: map-get($grid-breakpoints, "sm");
-$md-break: map-get($grid-breakpoints, "md");
-$lg-break: map-get($grid-breakpoints, "lg");
-$xl-break: map-get($grid-breakpoints, "xl");
+// Define breakpoint variables for component use
+$sm-break: 576px;
+$md-break: 768px;
+$lg-break: 992px;
+$xl-break: 1200px;
 
 body {
   background-color: #f5f5f5;
