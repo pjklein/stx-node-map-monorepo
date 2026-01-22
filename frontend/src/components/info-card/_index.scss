@@ -2,14 +2,14 @@
 $md-break: 768px;
 
 .info-card {
-  margin: 30px 0;
+  margin: 10px 0;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   
   @media (min-width: $md-break) {
-    margin: 60px 0;
+    margin: 15px 0;
   }
 
   .card-content {

@@ -20,56 +20,56 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
     const p2pNodes = nodes.filter(n => n.connection_status === "p2p_only").length;
     const offlineNodes = nodes.filter(n => n.connection_status === "offline").length;
 
-    return <div className="row mb-4">
-        <div className="col-12 col-sm-6 col-md-3 mb-3 mb-md-2">
+    return <div className="row mb-2">
+        <div className="col-12 col-sm-6 col-md-3 mb-2">
             <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                    <h6 className="card-title text-muted">Total Nodes</h6>
-                    <h2 className="text-primary">
+                <div className="card-body py-2 px-3">
+                    <h6 className="card-title text-muted mb-1" style={{fontSize: '0.75rem'}}>Total Nodes</h6>
+                    <h2 className="text-primary mb-0" style={{fontSize: '1.75rem'}}>
                         {loading ? '...' : <CountUp end={totalNodes} duration={1} />}
                     </h2>
-                    <small className="text-muted">{network}</small>
+                    <small className="text-muted" style={{fontSize: '0.7rem'}}>{network}</small>
                 </div>
             </div>
         </div>
-        <div className="col-12 col-sm-6 col-md-3 mb-3 mb-md-2">
+        <div className="col-12 col-sm-6 col-md-3 mb-2">
             <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                    <h6 className="card-title text-muted">Geo-Located</h6>
-                    <h2 className="text-success">
+                <div className="card-body py-2 px-3">
+                    <h6 className="card-title text-muted mb-1" style={{fontSize: '0.75rem'}}>Geo-Located</h6>
+                    <h2 className="text-success mb-0" style={{fontSize: '1.75rem'}}>
                         {loading ? '...' : <CountUp end={nodesWithLocation} duration={1} />}
                     </h2>
-                    <small className="text-muted">{((nodesWithLocation / totalNodes) * 100).toFixed(1)}%</small>
+                    <small className="text-muted" style={{fontSize: '0.7rem'}}>{((nodesWithLocation / totalNodes) * 100).toFixed(1)}%</small>
                 </div>
             </div>
         </div>
-        <div className="col-12 col-sm-6 col-md-3 mb-3 mb-md-2">
+        <div className="col-12 col-sm-6 col-md-3 mb-2">
             <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                    <h6 className="card-title text-muted">Countries</h6>
-                    <h2 className="text-info">
+                <div className="card-body py-2 px-3">
+                    <h6 className="card-title text-muted mb-1" style={{fontSize: '0.75rem'}}>Countries</h6>
+                    <h2 className="text-info mb-0" style={{fontSize: '1.75rem'}}>
                         {loading ? '...' : <CountUp end={uniqueCountries} duration={1} />}
                     </h2>
-                    <small className="text-muted">Worldwide Distribution</small>
+                    <small className="text-muted" style={{fontSize: '0.7rem'}}>Worldwide Distribution</small>
                 </div>
             </div>
         </div>
-        <div className="col-12 col-sm-6 col-md-3 mb-3 mb-md-2">
+        <div className="col-12 col-sm-6 col-md-3 mb-2">
             <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                    <h6 className="card-title text-muted">Connection Status</h6>
-                    <div className="mt-3">
-                        <div className="d-flex align-items-center mb-2">
+                <div className="card-body py-2 px-3">
+                    <h6 className="card-title text-muted mb-1" style={{fontSize: '0.75rem'}}>Connection Status</h6>
+                    <div className="mt-1">
+                        <div className="d-flex align-items-center mb-1">
                             <span className="legend-color-box" style={{backgroundColor: '#28a745'}}></span>
-                            <small className="ms-3">API ({loading ? '?' : apiNodes})</small>
+                            <small className="ms-2" style={{fontSize: '0.7rem'}}>API ({loading ? '?' : apiNodes})</small>
                         </div>
-                        <div className="d-flex align-items-center mb-2">
+                        <div className="d-flex align-items-center mb-1">
                             <span className="legend-color-box" style={{backgroundColor: '#ffc107'}}></span>
-                            <small className="ms-3">P2P Only ({loading ? '?' : p2pNodes})</small>
+                            <small className="ms-2" style={{fontSize: '0.7rem'}}>P2P Only ({loading ? '?' : p2pNodes})</small>
                         </div>
-                        <div className="d-flex align-items-center mb-2">
+                        <div className="d-flex align-items-center mb-1">
                             <span className="legend-color-box" style={{backgroundColor: '#dc3545'}}></span>
-                            <small className="ms-3">Offline ({loading ? '?' : offlineNodes})</small>
+                            <small className="ms-2" style={{fontSize: '0.7rem'}}>Offline ({loading ? '?' : offlineNodes})</small>
                         </div>
                     </div>
                 </div>

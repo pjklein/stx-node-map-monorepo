@@ -58,7 +58,9 @@ function App() {
             <NavBar network={network} />
             {error && <div className="alert alert-danger m-2 m-md-3">{error}</div>}
             <div className="container-fluid py-2 py-md-3 px-2 px-md-3">
-                <div className="row mb-2 mb-md-3">
+                <InfoCard network={network} nodes={nodes} loading={loading} />
+                
+                <div className="row mb-2">
                     <div className="col-12">
                         <div className="btn-group w-100 d-flex" role="group">
                             <NavLink 
@@ -78,8 +80,6 @@ function App() {
                         </div>
                     </div>
                 </div>
-                
-                <InfoCard network={network} nodes={nodes} loading={loading} />
                 
                 <Routes>
                     <Route path="/map" element={<Map nodes={filteredNodes} loading={loading} />} />
