@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 import {Navbar, Nav} from "react-bootstrap";
 
@@ -23,6 +24,22 @@ const NavBar: React.FC<NavBarProps> = ({ network }) => {
         </Navbar.Brand>
         <Navbar.Toggle/>
         <Navbar.Collapse>
+            <Nav className="me-auto ms-3">
+                <NavLink 
+                    to="/map" 
+                    className={({ isActive }: { isActive: boolean }) => isActive ? "nav-link text-white active-view" : "nav-link text-white-50"}
+                >
+                    <span className="d-none d-sm-inline">🗺️ Map View</span>
+                    <span className="d-inline d-sm-none">🗺️</span>
+                </NavLink>
+                <NavLink 
+                    to="/list" 
+                    className={({ isActive }: { isActive: boolean }) => isActive ? "nav-link text-white active-view" : "nav-link text-white-50"}
+                >
+                    <span className="d-none d-sm-inline">📋 List View</span>
+                    <span className="d-inline d-sm-none">📋</span>
+                </NavLink>
+            </Nav>
             <Nav className="ms-auto">
                 <Nav.Link href="https://stacks.org" target="_blank" className="text-white">
                   Stacks {openInNewSvg}

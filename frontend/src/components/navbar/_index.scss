@@ -38,6 +38,11 @@ $md-break: 768px;
     @media (min-width: $md-break) {
       font-size: 1rem;
     }
+    
+    &.active-view {
+      font-weight: 600;
+      border-bottom: 2px solid white;
+    }
 
     svg {
       height: 10px;

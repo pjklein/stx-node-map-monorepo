@@ -60,27 +60,6 @@ function App() {
             <div className="container-fluid py-2 py-md-3 px-2 px-md-3">
                 <InfoCard network={network} nodes={nodes} loading={loading} />
                 
-                <div className="row mb-2">
-                    <div className="col-12">
-                        <div className="btn-group w-100 d-flex" role="group">
-                            <NavLink 
-                                to="/map" 
-                                className={({ isActive }: { isActive: boolean }) => isActive ? "btn btn-primary flex-fill" : "btn btn-outline-primary flex-fill"}
-                            >
-                                <span className="d-none d-sm-inline">Map View</span>
-                                <span className="d-inline d-sm-none">🗺️ Map</span>
-                            </NavLink>
-                            <NavLink 
-                                to="/list" 
-                                className={({ isActive }: { isActive: boolean }) => isActive ? "btn btn-primary flex-fill" : "btn btn-outline-primary flex-fill"}
-                            >
-                                <span className="d-none d-sm-inline">List View</span>
-                                <span className="d-inline d-sm-none">📋 List</span>
-                            </NavLink>
-                        </div>
-                    </div>
-                </div>
-                
                 <Routes>
                     <Route path="/map" element={<Map nodes={filteredNodes} loading={loading} />} />
                     <Route path="/list" element={
