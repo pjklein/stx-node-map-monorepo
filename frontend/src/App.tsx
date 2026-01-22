@@ -6,7 +6,6 @@ import NavBar from "./components/navbar";
 import InfoCard from "./components/info-card";
 import Map from "./components/map";
 import NodeList from "./components/node-list";
-import { Footer } from "./components/footer";
 
 import config from "./config";
 
@@ -21,6 +20,19 @@ function App() {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [filteredNodes, setFilteredNodes] = useState<Node[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+        const saved = localStorage.getItem('theme');
+        return (saved as 'light' | 'dark') || 'light';
+    });
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    };
 
     const load = () => {
         setLoading(true);
@@ -55,7 +67,7 @@ function App() {
 
     return (
         <div className="App">
-            <NavBar network={network} />
+            <NavBar network={network} theme={theme} toggleTheme={toggleTheme} />
             {error && <div className="alert alert-danger m-2 m-md-3">{error}</div>}
             <div className="container-fluid py-2 py-md-3 px-2 px-md-3">
                 <InfoCard network={network} nodes={nodes} loading={loading} />
@@ -73,7 +85,6 @@ function App() {
                     <Route path="/" element={<Navigate to="/map" replace />} />
                 </Routes>
             </div>
-            <Footer />
         </div>
     );
 }
