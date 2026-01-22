@@ -1,6 +1,43 @@
 // Breakpoint variables
 $md-break: 768px;
 
+.info-cards-container {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.25rem;
+  
+  @media (min-width: $md-break) {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow-x: visible;
+  }
+  
+  // Hide scrollbar but keep functionality
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.info-card-item {
+  flex: 0 0 auto;
+  width: 140px;
+  scroll-snap-align: start;
+  
+  @media (min-width: $md-break) {
+    width: auto;
+    flex: 1;
+  }
+  
+  .card {
+    height: 100%;
+  }
+}
+
 .info-card {
   margin: 10px 0;
   display: flex;

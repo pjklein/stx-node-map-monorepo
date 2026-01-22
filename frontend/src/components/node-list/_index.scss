@@ -3,9 +3,14 @@ $md-break: 768px;
 
 .node-list-wrapper {
   .card {
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 200px);
     display: flex;
     flex-direction: column;
+    
+    // Mobile landscape - much shorter
+    @media (max-height: 500px) and (orientation: landscape) {
+      max-height: calc(100vh - 150px);
+    }
     
     @media (min-width: $md-break) {
       max-height: calc(100vh - 400px);
@@ -54,7 +59,12 @@ $md-break: 768px;
     flex: 1;
     overflow-y: auto;
     overflow-x: auto;
-    max-height: calc(100vh - 400px);
+    max-height: calc(100vh - 300px);
+    
+    // Mobile landscape - must be scrollable
+    @media (max-height: 500px) and (orientation: landscape) {
+      max-height: calc(100vh - 180px);
+    }
     
     @media (min-width: $md-break) {
       max-height: calc(100vh - 500px);

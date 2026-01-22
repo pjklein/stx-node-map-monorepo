@@ -20,8 +20,8 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
     const p2pNodes = nodes.filter(n => n.connection_status === "p2p_only").length;
     const offlineNodes = nodes.filter(n => n.connection_status === "offline").length;
 
-    return <div className="row mb-2">
-        <div className="col-12 col-sm-6 col-md-3 mb-2">
+    return <div className="info-cards-container mb-2">
+        <div className="info-card-item">
             <div className="card h-100 shadow-sm">
                 <div className="card-body py-2 px-3">
                     <h6 className="card-title text-muted mb-1" style={{fontSize: '0.75rem'}}>Total Nodes</h6>
@@ -32,7 +32,7 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
                 </div>
             </div>
         </div>
-        <div className="col-12 col-sm-6 col-md-3 mb-2">
+        <div className="info-card-item">
             <div className="card h-100 shadow-sm">
                 <div className="card-body py-2 px-3">
                     <h6 className="card-title text-muted mb-1" style={{fontSize: '0.75rem'}}>Geo-Located</h6>
@@ -43,7 +43,7 @@ const InfoCard: React.FC<Props> = ({ network, nodes, loading = false }) => {
                 </div>
             </div>
         </div>
-        <div className="col-12 col-sm-6 col-md-3 mb-2">
+        <div className="info-card-item">
             <div className="card h-100 shadow-sm">
                 <div className="card-body py-2 px-3">
                     <h6 className="card-title text-muted mb-1" style={{fontSize: '0.75rem'}}>Countries</h6>

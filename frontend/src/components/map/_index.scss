@@ -40,12 +40,19 @@ $xl-break: 1200px;
 
   .the-map {
     // Mobile-first: smaller height for mobile devices
-    height: 400px !important;
-    min-height: 300px !important;
-    max-height: 500px !important;
+    height: 300px !important;
+    min-height: 250px !important;
+    max-height: 400px !important;
 
     border: 2px solid $gray-100;
     border-radius: 4px;
+    
+    // Mobile landscape - even shorter
+    @media (max-height: 500px) and (orientation: landscape) {
+      height: 200px !important;
+      min-height: 200px !important;
+      max-height: 250px !important;
+    }
 
     // Larger screens get more height
     @media (min-width: $md-break) {
