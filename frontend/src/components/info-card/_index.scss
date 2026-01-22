@@ -1,40 +1,80 @@
 // Breakpoint variables
 $md-break: 768px;
 
-.info-cards-container {
+// Compact info bar for mobile
+.info-bar-mobile {
   display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 0.25rem;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  gap: 12px;
+  margin: 0 0.25rem;
   
-  @media (min-width: $md-break) {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    overflow-x: visible;
+  .primary-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #0d6efd;
+      line-height: 1;
+    }
+    
+    .stat-label {
+      font-size: 0.65rem;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
   }
   
-  // Hide scrollbar but keep functionality
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
+  .separator {
+    width: 1px;
+    height: 35px;
+    background: #dee2e6;
   }
-}
-
-.info-card-item {
-  flex: 0 0 auto;
-  width: 140px;
-  scroll-snap-align: start;
   
-  @media (min-width: $md-break) {
-    width: auto;
+  .secondary-stats {
+    display: flex;
+    gap: 10px;
     flex: 1;
-  }
-  
-  .card {
-    height: 100%;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      
+      .stat-icon {
+        font-size: 0.9rem;
+      }
+      
+      .stat-text {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #495057;
+      }
+      
+      &.status-compact {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        
+        .status-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          display: inline-block;
+        }
+      }
+    }
   }
 }
 
