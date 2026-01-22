@@ -20,7 +20,6 @@ const NavBar: React.FC<NavBarProps> = ({ network }) => {
                 style={{ marginRight: '10px' }}
             />
             <span>STX Node Map</span>
-            {network && <small className="ms-2 text-muted">({network})</small>}
         </Navbar.Brand>
         <Navbar.Toggle/>
         <Navbar.Collapse>
