@@ -43,7 +43,7 @@ const NavBar: React.FC<NavBarProps> = ({ network, theme, toggleTheme }) => {
         return date.toLocaleTimeString();
     };
 
-    return <Navbar className="main-nav-bar" expand="md" variant={theme === 'dark' ? 'dark' : 'light'} bg={theme === 'dark' ? 'dark' : 'light'} sticky="top">
+    return <Navbar className="main-nav-bar" expand="md" variant={theme === 'light' ? 'light' : 'dark'} bg={theme === 'light' ? 'light' : 'dark'} sticky="top">
         <Navbar.Brand href="#home">
             <img
                 src="/logo.png"

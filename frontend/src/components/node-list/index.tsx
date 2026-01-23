@@ -110,7 +110,7 @@ const NodeList: React.FC<Props> = ({ nodes, searchTerm, onSearchChange, loading 
     return <div className="row node-list-wrapper">
         <div className="col-md-12">
             <div className="card shadow-sm">
-                <div className="card-header bg-primary text-white">
+                <div className="card-header">
                     <h5 className="mb-0">📋 Node List ({sortedNodes.length} / {nodes.length} nodes)</h5>
                 </div>
                 <div className="card-body">

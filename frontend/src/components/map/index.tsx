@@ -127,7 +127,7 @@ const NodeMap: React.FC<Props> = ({ nodes, loading = false }) => {
     return <div className="row">
         <div className="col-md-12">
             <div className="card shadow-sm node-map">
-                <div className="card-header bg-primary text-white">
+                <div className="card-header">
                     <h5 className="mb-0">📍 Node Distribution Map ({publicCount} geo-located nodes)</h5>
                 </div>
                 <div className="card-body p-0">

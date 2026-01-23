@@ -77,6 +77,74 @@ img {
   height: auto;
 }
 
+// Theme-aware cards
+.card {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  
+  .card-header {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: var(--text-primary);
+    border-bottom-color: var(--border-color);
+    font-weight: 600;
+  }
+  
+  .card-body {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+  }
+}
+
+// Theme-aware form controls
+.form-control, .form-select {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  
+  &:focus {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border-color: #0d6efd;
+  }
+  
+  &::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+  }
+}
+
+// Theme-aware table
+.table {
+  color: var(--text-primary);
+  
+  thead {
+    background-color: rgba(0, 0, 0, 0.03);
+    color: var(--text-primary);
+  }
+  
+  tbody tr {
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+  }
+}
+
+[data-theme="dark"] {
+  .table {
+    thead {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    tbody tr {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+      }
+    }
+  }
+}
+
 // Better touch targets for mobile
 @media (max-width: $md-break) {
   .btn-sm {
